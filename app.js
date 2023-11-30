@@ -1,29 +1,29 @@
-//loading modules
+// Carregando módulos
 const express = require('express');
 const handlebars = require('express-handlebars');
-const bodyparser = require('body-parser');
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser'); // Apenas uma importação
 const app = express();
-//const moongose = require('mongoose');
+const admin = require('./routes/admin');
 
-//config
-    app.use(bodyParser.urlencoded({extended: true}));
-    app.use(bodyParser.json);
+// Configuração
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-    app.engine('handlebars', handlebars.engine({
-        defaultLayout: 'main',
-        runtimeOptions: {
-          allowProtoPropertiesByDefault: true,
-          allowProtoMethodsByDefault: true,
-        }
-    }));
-    app.set('view engine', 'handlebars');
-//routes(temporary)
+app.engine('handlebars', handlebars.engine({
+    defaultLayout: 'main',
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    }
+}));
+app.set('view engine', 'handlebars');
 
-//others
-const PORT = 3306;
+// Rotas
+app.use('/admin', admin);
 
-app.listen(PORT, ()=>{
-    console.log("rodando na porta: "+PORT);
-})
+// Outros
+const PORT = 8084;
 
+app.listen(PORT, () => {
+    console.log("Rodando na porta: " + PORT);
+});
