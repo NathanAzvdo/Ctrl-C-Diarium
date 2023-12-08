@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-
+const mongoose = require('mongoose');
+require('../models/Categoria');
+const Categoria = mongoose.model("Categorias");
 
 //routes
 router.get('/', (req, res) => {
@@ -14,6 +16,17 @@ router.get('/categorias', (req, res) => {
 })
 router.get('/categorias/add', (req, res) => {
     res.render("admin/addcategoria");
+})
+router.post('/categorias/new', (req, res)=> {
+    const newCat = {
+        nome: req.body.Name,
+        slug: req.body.Slug
+    }
+    new Categoria(newCat).save().then(()=>{
+        console.log("Category saved successfully")
+    }).catch((err)=>{
+        console.log("error saving category in mongodb! "+ err)
+    })
 })
 
 
