@@ -47,10 +47,12 @@ app.listen(PORT, () => {
 });
 
 app.use((req, res, next)=>{
-    res.locals.success = req.flash("sucess");
-    res.locals.error = req.flash("error");
+    res.locals.success_msg = req.flash("sucess_msg");
+    res.locals.erro_msg = req.flash("erro_msg");
+    console.log("middleware completed")
     next();
 })
+
 
 //arquivos estáticos
 app.use(express.static(path.join(__dirname, "public")));

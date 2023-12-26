@@ -18,15 +18,34 @@ router.get('/categorias/add', (req, res) => {
     res.render("admin/addcategoria");
 })
 router.post('/categorias/new', (req, res)=> {
-    const newCat = {
-        nome: req.body.Name,
-        slug: req.body.Slug
+    var erros =[];
+    
+    if(!req.body.Name || typeof req.body.Name == undefined || req.body.Name == null){
+        erros.push({texto: "Nome inválido!"})
     }
-    new Categoria(newCat).save().then(()=>{
-        console.log("Category saved successfully")
-    }).catch((err)=>{
-        console.log("error saving category in mongodb! "+ err)
-    })
+    if(!req.body.Slug || typeof req.body.Slug == undefined || req.body.Slug == null){
+        erros.push({texto: "Slug inválido!"})
+    }
+    if(req.body.Name.lenght < 2){
+        erros.push({texto: "Nome muito curto!"})
+    }
+    if(erros.length>0){
+        res.render("admin/addcategoria", {erros: erros})
+    }
+    else{
+
+        const newCat = {
+            nome: req.body.Name,
+            slug: req.body.Slug
+        }
+        new Categoria(newCat).save().then(()=>{
+            req.flash("sucess_msg", "Categoria criada com sucesso!");
+            res.redirect("/admin/categorias");
+        }).catch((err)=>{
+            req.flash("erro_msg", "Erro ao salvar categoria, tente novamente!");
+            console.log(err);
+        })
+    }
 })
 
 
