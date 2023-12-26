@@ -5,5 +5,23 @@
     <h2>Categorias:</h2>
     <a href="/admin/categorias/add"><button class="btn btn-success">Adicionar categoria</button></a>
     </div>
+    <table id="myTable" class="display">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Slug</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each categorias}}
+            <tr>
+                <td>{{nome}}</td>
+                <td>{{slug}}</td>
+            </tr>
+        {{else}}
+        {{/each}}
+    </tbody>
+</table>
+
 </div>
     
