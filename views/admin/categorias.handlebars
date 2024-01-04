@@ -1,15 +1,15 @@
 {{>_navbarADM}}
 <div class="container text-center">
     {{>_msg}}
-    <div class="d-flex justify-content-between" style="width:50%; margin:0 auto">
-    <h2>Categorias:</h2>
+    <div class="card" style="padding:10px">
     <a href="/admin/categorias/add"><button class="btn btn-success">Adicionar categoria</button></a>
-    </div>
+    <hr>
     <table id="myTable" class="display">
     <thead>
         <tr>
             <th>Nome</th>
             <th>Slug</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -17,11 +17,17 @@
             <tr>
                 <td>{{nome}}</td>
                 <td>{{slug}}</td>
+                <td>
+                    <a href="/admin/categorias/edit/{{_id}}"><button class="btn btn-success">Editar</button></a>
+                    <button class="btn btn-danger">Excluir</button>
+
+                </td>
             </tr>
         {{else}}
         {{/each}}
     </tbody>
 </table>
+    </div>
 
 </div>
     

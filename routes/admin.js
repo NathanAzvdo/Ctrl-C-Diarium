@@ -11,17 +11,52 @@ router.get('/', (req, res) => {
 router.get('/posts', (req, res) => {
     res.send("Página de posts")
 })
+
 router.get('/categorias', (req, res) => {
     Categoria.find().then((categorias) =>{
         res.render('admin/categorias', {categorias: categorias})
     }).catch((err) =>{
-        req.flash("erro_msg", "Houve um erro ao listar as categorias!")
+        req.flash("error_msg", "Houve um erro ao listar as categorias!")
         res.redirect("/admin")
     })
 })
+
+router.get('/categorias/edit/:id', (req,res) => {
+    Categoria.findOne({_id:req.params.id}).then((categoria)=>{
+        res.render('admin/editar', {categoria: categoria});
+    }).catch((err)=>{
+        req.flash("error_msg", "Erro ao editar categoria, tente novamente");
+        res.redirect("/admin/categorias");
+    });
+})
+
 router.get('/categorias/add', (req, res) => {
     res.render("admin/addcategoria");
 })
+
+router.post('/categorias/edit', (req, res) => {
+    Categoria.findOne({ _id: req.body.id }).then((categoria) => {
+        if (!categoria) {
+            req.flash("error_msg", "Categoria não encontrada para edição");
+            return res.redirect("/admin/categorias");
+        }
+
+        categoria.nome = req.body.Name;
+        categoria.slug = req.body.Slug;
+
+        categoria.save().then(() => {
+            req.flash("success_msg", "Categoria editada com sucesso!");
+            res.redirect("/admin/categorias");
+        }).catch((err) => {
+            req.flash("error_msg", "Erro ao editar categoria, tente novamente!");
+            res.redirect("/admin/categorias");
+        });
+    }).catch((err) => {
+        req.flash("error_msg", "Erro ao encontrar categoria, tente novamente!");
+        res.redirect("/admin/categorias");
+    });
+});
+
 router.post('/categorias/new', (req, res)=> {
     var erros =[];
     
@@ -44,11 +79,11 @@ router.post('/categorias/new', (req, res)=> {
             slug: req.body.Slug
         }
         new Categoria(newCat).save().then(()=>{
-            req.flash("sucess_msg", "Categoria criada com sucesso!");
+            req.flash("success_msg", "Categoria criada com sucesso!");
             res.redirect("/admin/categorias");
         }).catch((err)=>{
-            req.flash("erro_msg", "Erro ao salvar categoria, tente novamente!");
-            console.log(err);
+            req.flash("error_msg", "Erro ao salvar categoria, tente novamente!");
+            res.redirect("/admin/categorias")
         })
     }
 })
