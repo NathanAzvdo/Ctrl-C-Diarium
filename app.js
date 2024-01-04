@@ -14,7 +14,7 @@ const flash = require('connect-flash');
 app.use(session({
     secret:"secretTest",
     resave: true,
-    saveUninitialized:true    
+    saveUninitialized:true, 
 }))
 app.use(flash());
 //body-parser
@@ -36,6 +36,12 @@ mongoose.connect('mongodb://localhost/blogapp').then(()=>{
 }).catch((err) => {
     console.log('Error to connect to mongodb:' + err)
 })
+app.use((req, res, next)=>{
+    res.locals.success_msg = req.flash("success_msg");
+    res.locals.error_msg = req.flash("error_msg");
+    next();
+})
+
 // Rotas
 app.use('/admin', admin);
 
@@ -46,12 +52,6 @@ app.listen(PORT, () => {
     console.log("running on: localhost:" + PORT);
 });
 
-app.use((req, res, next)=>{
-    res.locals.success_msg = req.flash("success_msg");
-    res.locals.error_msg = req.flash("error_msg");
-    console.log("middleware completed")
-    next();
-})
 
 
 //arquivos estáticos

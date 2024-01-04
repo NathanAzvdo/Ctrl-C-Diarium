@@ -21,6 +21,29 @@ router.get('/categorias', (req, res) => {
     })
 })
 
+
+router.get('/categorias/remove/:id', async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const resultadoExclusao = await Categoria.findByIdAndDelete(id);
+
+        if (resultadoExclusao) {
+            req.flash("success_msg", "Categoria deletada com sucesso!");
+        } else {
+            req.flash("error_msg", "Não foi possível deletar a categoria!");
+        }
+
+        const categorias = await Categoria.find(); // ou qualquer lógica para obter a lista atualizada de categorias
+
+        res.render('admin/categorias', { categorias });
+    } catch (erro) {
+        console.error('Erro ao deletar categoria:', erro);
+        req.flash("error_msg", "Erro ao deletar categoria!");
+        res.redirect("/admin/categorias");
+    }
+});
+
 router.get('/categorias/edit/:id', (req,res) => {
     Categoria.findOne({_id:req.params.id}).then((categoria)=>{
         res.render('admin/editar', {categoria: categoria});
@@ -66,7 +89,7 @@ router.post('/categorias/new', (req, res)=> {
     if(!req.body.Slug || typeof req.body.Slug == undefined || req.body.Slug == null){
         erros.push({texto: "Slug inválido!"})
     }
-    if(req.body.Name.lenght < 2){
+    if(req.body.Name.length < 2){
         erros.push({texto: "Nome muito curto!"})
     }
     if(erros.length>0){

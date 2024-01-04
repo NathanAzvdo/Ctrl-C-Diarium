@@ -1,7 +1,7 @@
 {{>_navbarADM}}
 <div class="container text-center">
-    {{>_msg}}
     <div class="card" style="padding:10px">
+    {{>_msg}}
     <a href="/admin/categorias/add"><button class="btn btn-success">Adicionar categoria</button></a>
     <hr>
     <table id="myTable" class="display">
@@ -19,7 +19,7 @@
                 <td>{{slug}}</td>
                 <td>
                     <a href="/admin/categorias/edit/{{_id}}"><button class="btn btn-success">Editar</button></a>
-                    <button class="btn btn-danger">Excluir</button>
+                    <a href="/admin/categorias/remove/{{_id}}"><button class="btn btn-danger">Excluir</button></a>
 
                 </td>
             </tr>
