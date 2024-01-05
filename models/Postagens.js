@@ -19,8 +19,8 @@ const Postagens = new Schema({
         required:true
     },
     categoria:{
-        type: mongoose.SchemaType.ObjectId,
-        ref:"categorias", 
+        type: mongoose.SchemaTypes.ObjectId,
+        ref:"Categorias", 
         required:true
     },
     date:{

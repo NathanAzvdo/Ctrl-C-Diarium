@@ -3,13 +3,72 @@ const router = express.Router();
 const mongoose = require('mongoose');
 require('../models/Categoria');
 const Categoria = mongoose.model("Categorias");
-
+require('../models/Postagens');
+const Postagem = mongoose.model("Postagens");
 //routes
 router.get('/', (req, res) => {
-    res.render("admin/index")
+    res.render("admin/index");
 })
 router.get('/posts', (req, res) => {
-    res.send("Página de posts")
+    res.render("admin/postagens");
+})
+router.get('/posts/add', (req, res)=>{
+    Categoria.find().then((categorias)=>{
+        res.render('admin/addposts', {categorias:categorias});
+    }).catch((err)=>{
+        req.flash("error_msg", "Houve um erro ao carregar o formulário!");
+        res.redirect("/admin/posts")
+    })
+});
+
+router.post('/posts/new', (req, res)=>{
+    var erros =[];
+    
+    if(!req.body.Title || typeof req.body.Title == undefined || req.body.Title == null){
+        erros.push({texto: "Nome inválido!"})
+    }
+    if(!req.body.Slug || typeof req.body.Slug == undefined || req.body.Slug == null){
+        erros.push({texto: "Slug inválido!"})
+    }
+    if(!req.body.Cont || typeof req.body.Cont == undefined || req.body.Cont == null){
+        erros.push({texto: "Conteúdo inválido!"})
+    }
+    if(!req.body.Desc || typeof req.body.Desc == undefined || req.body.Desc == null){
+        erros.push({texto: "Descrição inválida!"})
+    }
+    if(req.body.Title.length < 3){
+        erros.push({texto: "Título muito curto!"})
+    }
+    if(req.body.Cont < 10){
+        erros.push({texto: "Conteúdo muito curto!"})
+
+    }
+    if(req.body.Categoria=="0"){
+        erros.push("Registre uma categoria!")
+    }
+    if(req.body.Desc > 5){
+        erros.push("Descrição muito curta!");
+    }
+    if(erros.length>0){
+        res.render("admin/addposts", {erros: erros})
+    }
+    
+    else{
+        const newPosts = {
+            titulo: req.body.Title,
+            descricao: req.body.Desc,
+            conteudo: req.body.Cont,
+            slug: req.body.Slug,
+            categoria: req.body.cat
+        }
+        new Postagem(newPosts).save().then(()=>{
+            req.flash("success_msg", "Postagem salva com sucesso!");
+            res.redirect("/admin/posts");
+        }).catch((err)=>{
+            req.flash("error_msg", "Erro ao salvar postagem, tente novamente!")
+            res.redirect("/admin/posts")
+        })
+    }
 })
 
 router.get('/categorias', (req, res) => {
