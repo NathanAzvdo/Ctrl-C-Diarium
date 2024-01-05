@@ -19,7 +19,7 @@ const Postagens = new Schema({
         required:true
     },
     categoria:{
-        type: mongoose.SchemaTypes.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref:"Categorias", 
         required:true
     },

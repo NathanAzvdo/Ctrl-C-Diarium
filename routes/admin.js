@@ -9,9 +9,6 @@ const Postagem = mongoose.model("Postagens");
 router.get('/', (req, res) => {
     res.render("admin/index");
 })
-router.get('/posts', (req, res) => {
-    res.render("admin/postagens");
-})
 router.get('/posts/add', (req, res)=>{
     Categoria.find().then((categorias)=>{
         res.render('admin/addposts', {categorias:categorias});
@@ -79,7 +76,35 @@ router.get('/categorias', (req, res) => {
         res.redirect("/admin")
     })
 })
+router.get('/posts', (req, res) => {
+    Postagem.find().populate("categoria").then((postagens)=>{
+        res.render("admin/postagens", {postagens: postagens});
+    }).catch((err)=>{
+        req.flash("error_msg", "Erro ao carregar categorias!");
+        res.render("admin/postagens");
+    })
+    
+    
+})
+router.get('/posts/remove/:id', async(req,res)=>{
+    const id = req.params.id;
 
+    try{
+        const resultEx = await Postagem.findByIdAndDelete(id);
+
+        if(resultEx){
+            req.flash("success_msg", "Categoria deletada com sucesso!");
+            res.redirect('/admin/posts');
+        }else {
+            req.flash("error_msg", "Não foi possível deletar a categoria!");
+            res.redirect('/admin/posts');
+        } 
+    } catch (erro) {
+        console.error('Erro ao deletar categoria:', erro);
+        req.flash("error_msg", "Erro ao deletar categoria!");
+        res.redirect("/admin/categorias");
+    }
+    });
 
 router.get('/categorias/remove/:id', async (req, res) => {
     const id = req.params.id;
@@ -89,13 +114,11 @@ router.get('/categorias/remove/:id', async (req, res) => {
 
         if (resultadoExclusao) {
             req.flash("success_msg", "Categoria deletada com sucesso!");
+            res.redirect("/admin/categorias");
         } else {
             req.flash("error_msg", "Não foi possível deletar a categoria!");
+            res.redirect("/admin/categorias");
         }
-
-        const categorias = await Categoria.find(); // ou qualquer lógica para obter a lista atualizada de categorias
-
-        res.render('admin/categorias', { categorias });
     } catch (erro) {
         console.error('Erro ao deletar categoria:', erro);
         req.flash("error_msg", "Erro ao deletar categoria!");
@@ -104,12 +127,29 @@ router.get('/categorias/remove/:id', async (req, res) => {
 });
 
 router.get('/categorias/edit/:id', (req,res) => {
+    
     Categoria.findOne({_id:req.params.id}).then((categoria)=>{
         res.render('admin/editar', {categoria: categoria});
     }).catch((err)=>{
-        req.flash("error_msg", "Erro ao editar categoria, tente novamente");
+        req.flash("error_msg", "Erro ao editar categoria, tente novamente!");
         res.redirect("/admin/categorias");
     });
+})
+
+router.get('/posts/edit/:id', (req,res)=>{
+    Categoria.find().then((categorias)=>{
+        Postagem.findOne({_id:req.params.id}).then((postagem)=>{
+            res.render('admin/editarPost', {postagem: postagem, categorias: categorias})
+        }).catch((err)=>{
+            req.flash("error_msg", "Erro ao editar postagem, tente novamente!");
+            res.redirect("/admin/posts")
+        })
+    }).catch((err)=>{
+        req.flash("error_msg", "Houve um erro ao carregar o formulário!");
+        res.redirect("/admin/posts")
+    })
+    
+    
 })
 
 router.get('/categorias/add', (req, res) => {
@@ -138,6 +178,27 @@ router.post('/categorias/edit', (req, res) => {
         res.redirect("/admin/categorias");
     });
 });
+router.post('/posts/edit', (req,res)=>{
+    Postagem.findOne({_id: req.body.id}).then((postagem)=>{
+        if(!postagem){
+            req.flash("error_msg", "Postagem não encontrada para edição");
+            return res.redirect("/admin/posts");
+        }
+        postagem.titulo = req.body.Title;
+        postagem.descricao = req.body.Desc;
+        postagem.slug = req.body.Slug;
+        postagem.conteudo = req.body.Cont;
+        postagem.categoria = req.body.cat;
+
+        postagem.save().then(() => {
+            req.flash("success_msg", "Postagem editada com sucesso");
+            res.redirect("/admin/posts");
+        }).catch((err)=>{
+            req.flash("erro_msg", "Não foi possível editar a postagem!");
+            res.redirect("/admin/posts");
+        })
+    })
+})
 
 router.post('/categorias/new', (req, res)=> {
     var erros =[];

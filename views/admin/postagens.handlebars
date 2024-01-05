@@ -1,9 +1,47 @@
 {{>_navbarADM}}
+
 <div class="container">
     <div class="card" style="padding:10px;">
         {{>_msg}}
         <div class="text-center">
             <a href="/admin/posts/add"><button class="btn btn-success">Adicionar postagens</button></a>
+        </div>
+        <hr>
+
+        <div class="accordion accordion-flush" id="accordionFlushExample">
+            {{#each postagens}}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{slug}}" aria-expanded="false" aria-controls="{{slug}}">
+                            {{titulo}}
+                        </button>
+                    </h2>
+                    <div id="{{slug}}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <div class="text-center">
+                                <h2><bold><b>{{slug}}</b></bold></h2>
+                            </div>
+                            <hr>
+                            <h4>Descrição:</h4>
+                            <p>{{descricao}}</p>
+                            <hr>
+                            <h4>Conteúdo:</h4>
+                            <p>{{conteudo}}</p>
+                            <hr>
+                            <p><h4>Categoria:</h4><b>{{categoria.nome}}</b></p>
+                            <hr>
+                            <div class="d-flex justify-content-evenly">
+                                <a href="/admin/posts/edit/{{_id}}"><button class="btn btn-success">Editar</button></a>
+                                <a href="/admin/posts/remove/{{_id}}"><button class="btn btn-danger">Apagar</button></a>
+                            </div>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            {{else}}
+                <!-- ... (outros trechos da sua view) ... -->
+            {{/each}}
         </div>
     </div>
 </div>

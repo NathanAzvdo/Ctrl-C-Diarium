@@ -1,0 +1,36 @@
+{{>_navbarADM}}
+<div class="container">
+    <h2 class="text-center">Editar categoria:</h2>
+    <div class="card" style="padding: 20px;">
+        {{#each erros}}
+.       <div class="alert alert-danger" role="alert">
+            {{texto}}
+        </div>
+    {{else}}
+    {{/each}}
+        <form action="/admin/posts/edit" method="POST">
+        <input type="hidden" name="id" value="{{postagem._id}}">
+        <label for="Title">Titulo:</label>
+        <input type="text" name="Title" class="form-control" required value="{{postagem.titulo}}">
+        <label for="Slug">Slug:</label>
+        <input type="text" name="Slug" class="form-control" required value="{{postagem.slug}}">
+        <label for="Desc">Descrição:</label>
+        <input type="text" name="Desc" class="form-control" required value="{{postagem.descricao}}">
+        <label for="Cont">Conteúdo:</label>
+        <textarea type="text" name="Cont" class="form-control" required style="height:300px;">{{postagem.conteudo}}</textarea>
+        <label for="cat">Categoria:</label>
+        <br>
+            <select name="cat" class="form-select" aria-label="Default select example">
+                {{#each categorias}}
+                    <option value="{{_id}}">{{nome}}</option>
+                    {{else}}
+                    <option value="0">Nenhuma categoria registrada</option>
+                {{/each}}
+            </select>
+        <br>
+        <div class="text-center">
+            <button type="submit" class="btn btn-success">Editar</button>
+        </div>
+        </form>
+    </div>
+</div>
