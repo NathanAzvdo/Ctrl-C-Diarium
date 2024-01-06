@@ -8,6 +8,8 @@ const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const flash = require('connect-flash');
+require('./models/Postagens');
+const Postagem = mongoose.model('Postagens')
 // Configuração
 
 //config sessão
@@ -42,7 +44,21 @@ app.use((req, res, next)=>{
     next();
 })
 
+//arquivos estáticos
+app.use(express.static(path.join(__dirname, "public")));
+//utilizamos o dirname para pegar o caminho absoluto para o diretorio
+
 // Rotas
+app.get('/', (req, res)=>{
+    Postagem.find().populate("categoria").sort({data:'descending'}).limit(5).then((postagens)=>{
+        res.render('index', {postagens:postagens});
+    }).catch((err)=>{
+        res.status(404).send('Erro 404: Página não encontrada');
+    })
+    
+    
+})
+
 app.use('/admin', admin);
 
 // Outros
@@ -53,7 +69,3 @@ app.listen(PORT, () => {
 });
 
 
-
-//arquivos estáticos
-app.use(express.static(path.join(__dirname, "public")));
-//utilizamos o dirname para pegar o caminho absoluto para o diretorio

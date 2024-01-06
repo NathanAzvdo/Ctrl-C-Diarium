@@ -1,0 +1,94 @@
+{{>_navbarADM}}
+
+<div class="container">
+    <div class="card animate__animated animate__fadeIn" style="padding:50px;">
+        <div class="jumbotron animate__animated animate__zoomIn">
+            <div class="container">
+                <div style="margin: 15px auto 25px">
+                    <h1 class="display-4">Seja bem-vindo ao Ctrl+C Diarium!</h1>
+                </div>
+                <p class="lead">Você encontrou o blog feito de dev para devs, com o intuito de debater tópicos da tecnologia.</p>
+                <hr class="my-4">
+                <p>O Ctrl+C Diarium é o lugar perfeito para explorar as últimas tendências tecnológicas, aprender novas habilidades de programação e se manter atualizado com o mundo da computação.</p>
+                <p>Nosso time de desenvolvedores apaixonados compartilha insights, tutoriais práticos e experiências do mundo real para ajudar você a aprimorar suas habilidades de programação e se manter inspirado.</p>
+                <p>Explore nosso conteúdo diversificado que abrange desde linguagens de programação populares até as últimas inovações em desenvolvimento web e mobile.</p>
+                <hr>
+                <div id="search-container" class="text-center">
+                  <h1 class="display-4" style="font-size: xx-large; margin:0px auto 25px">Tire suas dúvidas sobre tecnologia:</h1>
+                  <input type="text" id="search-input" placeholder="Digite sua pergunta">
+                  <br></br>
+                  <button class="btn btn-primary" onclick="search()">Pesquisar</button>
+                </div>
+                <div id="results-container">
+                  <!-- Aqui serão exibidos os resultados da pesquisa -->
+                </div>
+                <a href="#">Faça login</a>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <h1 class="display-4">
+        Posts recentes:
+    </h1>
+    <div class="card-columns">
+    {{#each postagens}}
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{titulo}}</h5>
+          <p class="card-text">{{descricao}}</p>
+          <div class="text-center">
+            <h2><strong>{{slug}}</strong></h2>
+          </div>
+          <hr>
+          <h4>Conteúdo:</h4>
+          <div style="white-space: pre-wrap"><p>{{conteudo}}</p></div>
+          <hr>
+          <p><h4>Categoria:</h4><strong>{{categoria.nome}}</strong></p>
+        </div>
+      </div>
+      {{else}}
+      <h5>Nenhuma postagem</h5>
+    {{/each}}
+  </div>
+
+</div>
+<script>
+    function search() {
+  console.log('Função search() foi chamada.');
+
+  var searchInput = document.getElementById('search-input').value;
+  console.log('Valor da pesquisa:', searchInput);
+
+  var resultsContainer = document.getElementById('results-container');
+
+  var apiKey = 'YOUR_API_KEY';
+  var modelName = 'gpt-3.5-turbo-1106';
+
+  var requestOptions = {
+    method: 'post',
+    url: 'https://api.openai.com/v1/engines/' + modelName + '/completions',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey,
+    },
+    data: {
+      prompt: searchInput,
+      max_tokens: 100,
+    },
+  };
+
+  console.log('Enviando solicitação para a API:', requestOptions);
+
+  axios(requestOptions)
+    .then(function (response) {
+      console.log('Resposta da API:', response.data);
+      var apiResponse = response.data.choices[0].text;
+      resultsContainer.innerHTML = '<p>' + apiResponse + '</p>';
+    })
+    .catch(function (error) {
+      console.error('Erro na solicitação à API:', error);
+      resultsContainer.innerHTML = '<p>Erro ao se comunicar com a API.</p>';
+    });
+}
+
+</script>
