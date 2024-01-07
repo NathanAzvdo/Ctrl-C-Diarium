@@ -1,0 +1,28 @@
+{{>_navbarADM}}
+<div class="container">
+
+{{>_msg}}
+
+    <div class="card-columns">
+        <h1>{{categoria.nome}}</h1>
+<h3 class style="font-size: xx-large;">
+        Posts:
+    </h3>
+    {{#each postagens}}
+      <div class="card" style="margin: 10px 0 50px;">
+        <div class="card-body">
+          <h5 class="card-title">{{titulo}}</h5>
+          <p class="card-text">{{descricao}}</p>
+          <div class="text-center">
+            <h2><strong>{{slug}}</strong></h2>
+          </div>
+          <hr>
+          <h4>Conteúdo:</h4>
+          <a href="/categorias/postCompleto/{{_id}}">Leia mais</a>
+        </div>
+      </div>
+      {{else}}
+      <h5>Nenhuma postagem</h5>
+    {{/each}}
+  </div>
+</div>

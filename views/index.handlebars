@@ -2,6 +2,7 @@
 
 <div class="container">
     <div class="card animate__animated animate__fadeIn" style="padding:50px;">
+      {{>_msg}}
         <div class="jumbotron animate__animated animate__zoomIn">
             <div class="container">
                 <div style="margin: 15px auto 25px">
@@ -27,12 +28,12 @@
         </div>
     </div>
     <hr>
-    <h1 class="display-4">
+    <h1 class style="font-size: xxx-large;">
         Posts recentes:
     </h1>
     <div class="card-columns">
     {{#each postagens}}
-      <div class="card">
+      <div class="card" style="margin: 10px 0 50px;">
         <div class="card-body">
           <h5 class="card-title">{{titulo}}</h5>
           <p class="card-text">{{descricao}}</p>
@@ -41,7 +42,7 @@
           </div>
           <hr>
           <h4>Conteúdo:</h4>
-          <div style="white-space: pre-wrap"><p>{{conteudo}}</p></div>
+          <a href="">Ler conteúdo</a>
           <hr>
           <p><h4>Categoria:</h4><strong>{{categoria.nome}}</strong></p>
         </div>

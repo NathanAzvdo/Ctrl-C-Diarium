@@ -1,0 +1,23 @@
+{{>_navbarADM}}
+<div class="container text-center">
+    <div class="card" style="padding:10px">
+    {{>_msg}}
+    <table id="myTable" class="display">
+    <thead>
+        <tr>
+            <th>Nome</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each categorias}}
+            <tr>
+                <td><a href="/categorias/posts/{{slug}}">{{nome}}</a></td>
+            </tr>
+        {{else}}
+        {{/each}}
+    </tbody>
+</table>
+    </div>
+
+</div>
+    
