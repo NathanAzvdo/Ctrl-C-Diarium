@@ -1,24 +1,22 @@
 {{>_navbarADM}}
-<div class="container">
 
-{{>_msg}}
+<div class="container">
+    {{>_msg}}
 
     <div class="card-columns">
-<h3 class style="font-size: xx-large;">
-        Post:
-    </h3>
-    
-      <div class="card" style="margin: 10px 0 50px;">
-        <div class="card-body">
-          <h5 class="card-title">{{postagem.titulo}}</h5>
-          <p class="card-text">{{descricao}}</p>
-          <div class="text-center">
-            <h2><strong>{{slug}}</strong></h2>
-          </div>
-          <hr>
-          <h4>Conteúdo:</h4>
-          <p>{{conteudo}}</p>
+        <h3 class style="font-size: xx-large;">Post:</h3>
+        <div class="card" style="margin: 10px 0 50px;">
+            <div class="card-body">
+                <h5 class="card-title">{{postagem.titulo}}</h5><br>
+                <p><b>descrição:</b></p>
+                <p class="card-text">{{postagem.descricao}}</p>
+                <div class="text-center" style="margin: 10px 0 30px">
+                    <h2><strong>{{postagem.slug}}</strong></h2>
+                </div>
+                <hr>
+                <h4>Conteúdo:</h4>
+                <p>{{postagem.conteudo}}</p>
+            </div>
         </div>
-      </div>
-  </div>
+    </div>
 </div>
