@@ -1,0 +1,50 @@
+{{>_navbarADM}}
+
+<div class="container">
+    <div class="text-center" style="margin:0px 0px 25px">
+        <div class="display-6">Faça cadastro:</div>
+    </div>
+    <div class="card" style="padding: 20px;">
+        {{>_msg}}
+        {{#each erros}}
+         <div class="alert alert-danger" role="alert">
+            {{texto}}
+        </div>
+    {{else}}
+    {{/each}}
+            <form action="/usuarios/registrar" method="POST">
+                <label for="nome">Username:</label>
+                    <input type="text" name="nome" class="form-control" required>
+                <label for="email">Email:</label>
+                    <input type="email" name="email" class="form-control" required>
+                <label for="senha">Senha:</label>
+                    <input type="password" name="senha" class="form-control" required>
+                <label for="senhacf">Confirme a senha:</label>
+                    <input type="password" name="senhacf" class="form-control" required>
+                <label for="telefone">Telefone:</label>
+                <br>
+                    <input type="tel" id="telefone" class="form-control" name="telefone" required> 
+                <br>
+                <br>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success mb-4">Cadastre-se</button>
+                </div>
+            </form>
+        </div>
+</div>
+
+
+
+<script>
+  var input = document.querySelector("#telefone");
+  var iti = window.intlTelInput(input, {
+    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    nationalMode: true  // Ativa o modo nacional para formatar o número com o código do país e DDD
+  });
+
+  // Adiciona a função onKeyup para formatar o número com parênteses
+  input.addEventListener('keyup', function () {
+    var currentNumber = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+    input.value = currentNumber.replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3');
+  });
+</script>
