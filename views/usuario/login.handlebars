@@ -6,12 +6,6 @@
     </div>
     <div class="card" style="padding: 20px;">
         {{>_msg}}
-        {{#each erros}}
-         <div class="alert alert-danger" role="alert">
-            {{texto}}
-        </div>
-    {{else}}
-    {{/each}}
             <form action="post">
                 <label for="email">Email:</label>
                     <input type="email" name="email" class="form-control" required>
