@@ -10,7 +10,7 @@ const Usuario = mongoose.model("Usuarios");
 module.exports = function(passport){
     
     
-    passport.use(new localStrategy({usernameField:'email'}, (email, senha, done)=>{
+    passport.use(new localStrategy({usernameField:'email', passwordField:'senha'}, (email, senha, done)=>{
         
         Usuario.findOne({email: email}).then((user)=>{
             if(!user){
@@ -29,15 +29,19 @@ module.exports = function(passport){
         })
     }))
 
-    passport.serializeUser((user, done)=>{
-        done(null, user.id);
+    passport.serializeUser((usuario,done)=>{
+        done(null,usuario.id)
     })
-
+    
     passport.deserializeUser((id,done)=>{
-        user.FindbyId(id, (err, usuario)=>{
-            done(err, user);
-        })
+        Usuario.findById(id).then((usuario)=>{
+            done(null,usuario)
+        }).catch((err)=>{
+             done (null,false,{message:'algo deu errado'})
+        });
     })
+    
+    
 
 
 

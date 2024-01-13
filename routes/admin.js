@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const {eAdmin} = require('../helpers/eAdmin');
 require('../models/Categoria');
 const Categoria = mongoose.model("Categorias");
 require('../models/Postagens');
 const Postagem = mongoose.model("Postagens");
 //routes
-router.get('/', (req, res) => {
+router.get('/', eAdmin, (req, res) => {
     res.render("admin/index");
 })
-router.get('/posts/add', (req, res)=>{
+router.get('/posts/add', eAdmin,  (req, res)=>{
     Categoria.find().then((categorias)=>{
         res.render('admin/addposts', {categorias:categorias});
     }).catch((err)=>{
@@ -18,7 +19,7 @@ router.get('/posts/add', (req, res)=>{
     })
 });
 
-router.post('/posts/new', (req, res)=>{
+router.post('/posts/new', eAdmin, (req, res)=>{
     var erros =[];
     
     if(!req.body.Title || typeof req.body.Title == undefined || req.body.Title == null){
@@ -68,7 +69,7 @@ router.post('/posts/new', (req, res)=>{
     }
 })
 
-router.get('/categorias', (req, res) => {
+router.get('/categorias', eAdmin, (req, res) => {
     Categoria.find().then((categorias) =>{
         res.render('admin/categorias', {categorias: categorias})
     }).catch((err) =>{
@@ -76,7 +77,7 @@ router.get('/categorias', (req, res) => {
         res.redirect("/admin")
     })
 })
-router.get('/posts', (req, res) => {
+router.get('/posts', eAdmin, (req, res) => {
     Postagem.find().populate("categoria").then((postagens)=>{
         res.render("admin/postagens", {postagens: postagens});
     }).catch((err)=>{
@@ -86,7 +87,7 @@ router.get('/posts', (req, res) => {
     
     
 })
-router.get('/posts/remove/:id', async(req,res)=>{
+router.get('/posts/remove/:id', eAdmin, async(req,res)=>{
     const id = req.params.id;
 
     try{
@@ -106,7 +107,7 @@ router.get('/posts/remove/:id', async(req,res)=>{
     }
     });
 
-router.get('/categorias/remove/:id', async (req, res) => {
+router.get('/categorias/remove/:id', eAdmin, async (req, res) => {
     const id = req.params.id;
 
     try {
@@ -126,7 +127,7 @@ router.get('/categorias/remove/:id', async (req, res) => {
     }
 });
 
-router.get('/categorias/edit/:id', (req,res) => {
+router.get('/categorias/edit/:id', eAdmin, (req,res) => {
     
     Categoria.findOne({_id:req.params.id}).then((categoria)=>{
         res.render('admin/editar', {categoria: categoria});
@@ -136,7 +137,7 @@ router.get('/categorias/edit/:id', (req,res) => {
     });
 })
 
-router.get('/posts/edit/:id', (req,res)=>{
+router.get('/posts/edit/:id', eAdmin, (req,res)=>{
     Categoria.find().then((categorias)=>{
         Postagem.findOne({_id:req.params.id}).then((postagem)=>{
             res.render('admin/editarPost', {postagem: postagem, categorias: categorias})
@@ -152,11 +153,11 @@ router.get('/posts/edit/:id', (req,res)=>{
     
 })
 
-router.get('/categorias/add', (req, res) => {
+router.get('/categorias/add', eAdmin, (req, res) => {
     res.render("admin/addcategoria");
 })
 
-router.post('/categorias/edit', (req, res) => {
+router.post('/categorias/edit', eAdmin, (req, res) => {
     Categoria.findOne({ _id: req.body.id }).then((categoria) => {
         if (!categoria) {
             req.flash("error_msg", "Categoria não encontrada para edição");
@@ -178,7 +179,7 @@ router.post('/categorias/edit', (req, res) => {
         res.redirect("/admin/categorias");
     });
 });
-router.post('/posts/edit', (req,res)=>{
+router.post('/posts/edit', eAdmin, (req,res)=>{
     Postagem.findOne({_id: req.body.id}).then((postagem)=>{
         if(!postagem){
             req.flash("error_msg", "Postagem não encontrada para edição");
@@ -200,7 +201,7 @@ router.post('/posts/edit', (req,res)=>{
     })
 })
 
-router.post('/categorias/new', (req, res)=> {
+router.post('/categorias/new', eAdmin, (req, res)=> {
     var erros =[];
     
     if(!req.body.Name || typeof req.body.Name == undefined || req.body.Name == null){

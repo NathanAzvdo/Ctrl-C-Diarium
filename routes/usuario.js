@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('../models/usuario');
 const Usuario = mongoose.model('Usuarios');
+const passport = require('passport')
 
 router.get('/registro', (req, res) => {
     res.render('usuario/cadastro');
@@ -62,7 +63,7 @@ router.post('/registrar', async (req, res) => {
                     nome: req.body.nome,
                     email: req.body.email,
                     senha: hashedPassword,
-                    cel: req.body.telefone
+                    cel: req.body.telefone,
                 };
 
                 new Usuario(newUser).save().then(() => {
@@ -83,5 +84,16 @@ router.post('/registrar', async (req, res) => {
 router.get("/login", (req, res)=>{
     res.render("usuario/login");
 })
-
+router.post('/log', (req, res, next)=>{
+    passport.authenticate("local", {
+        successRedirect:"/",
+        failureRedirect:"/usuarios/login",
+        failureFlash:true
+    })(req,res,next)
+})
+router.get('/logout', (req,res)=>{
+    req.logOut();
+    req.flash('sucess_msg', 'deslogado com sucesso!');
+    res.redirect("/")
+})
 module.exports = router;

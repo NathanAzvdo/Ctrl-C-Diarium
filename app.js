@@ -11,6 +11,9 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
 require("./config/auth")(passport);
+const {eUser} = require('./helpers/eUser');
+
+
 // Models
 require('./models/Postagens');
 require('./models/Categoria');
@@ -54,6 +57,8 @@ mongoose.connect('mongodb://localhost/blogapp').then(()=>{
 app.use((req, res, next)=>{
     res.locals.success_msg = req.flash("success_msg");
     res.locals.error_msg = req.flash("error_msg");
+    res.locals.error = req.flash("error");
+    res.locals.user = req.user || null
     next();
 })
 
@@ -63,11 +68,14 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Rotas
 app.get('/', (req, res)=>{
-    Postagem.find().populate("categoria").sort({data:'descending'}).limit(5).then((postagens)=>{
-        res.render('index', {postagens:postagens});
-    }).catch((err)=>{
-        res.status(404).send('Erro 404: Página não encontrada');
+    Postagem.find().populate("categoria").sort({ data: 'desc' }).limit(5)
+    .then((postagens) => {
+        res.render('index', { postagens: postagens });
     })
+    .catch((err) => {
+        res.status(404).send('Erro 404: Página não encontrada');
+    });
+
     
     
 })
@@ -99,7 +107,7 @@ app.get('/categorias/posts/:slug', (req,res)=>{
     })
 })
 
-app.get('/categorias/postCompleto/:id', (req, res)=>{    
+app.get('/categorias/postCompleto/:id', eUser, (req, res)=>{    
     Postagem.findOne({_id: req.params.id}).then((postagem)=>{
         res.render("categorias/postC", {postagem: postagem})
     }).catch((err)=>{
