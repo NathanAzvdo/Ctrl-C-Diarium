@@ -9,7 +9,8 @@ const usuarios =require('./routes/usuario')
 const mongoose = require('mongoose');
 const session = require('express-session');
 const flash = require('connect-flash');
-
+const passport = require('passport');
+require("./config/auth")(passport);
 // Models
 require('./models/Postagens');
 require('./models/Categoria');
@@ -26,6 +27,10 @@ app.use(session({
     resave: true,
     saveUninitialized:true, 
 }))
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(flash());
 //body-parser
 app.use(bodyParser.urlencoded({ extended: true }));
