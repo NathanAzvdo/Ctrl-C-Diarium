@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('../models/usuario');
 const Usuario = mongoose.model('Usuarios');
+require('../models/Comentario');
+const Comentario = mongoose.model('Comentario')
 const passport = require('passport')
 
 router.get('/registro', (req, res) => {
@@ -84,16 +86,61 @@ router.post('/registrar', async (req, res) => {
 router.get("/login", (req, res)=>{
     res.render("usuario/login");
 })
-router.post('/log', (req, res, next)=>{
-    passport.authenticate("local", {
-        successRedirect:"/",
-        failureRedirect:"/usuarios/login",
-        failureFlash:true
-    })(req,res,next)
+
+router.post('/log', (req, res, next) => {
+    passport.authenticate("local", (err, user, info) => {
+        
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            req.flash('error_msg', 'Usuário ou senha incorretos.');
+            return res.redirect("/usuarios/login");
+        }
+
+        req.logIn(user, (err) => {
+            if (err) {
+                return next(err);
+            }
+            res.locals.user = {username: user._id};
+            // Verifica se eAdmin é igual a 1
+            if (user.eAdmin === 1) {
+                return res.redirect("/admin");
+            } else {
+                return res.redirect("/");
+            }
+        });
+
+
+    })(req, res, next);
+});
+
+
+router.get('/logout', (req, res) => {
+    req.logout(err => {
+        if (err) {
+            console.error(err);
+            return next(err);
+        }
+        req.flash('success_msg', 'Deslogado com sucesso!');
+        res.redirect("/");
+    });
+});
+router.post('/comment',(req, res) => {
+            const newComment ={
+                conteudo:req.body.cont,
+                user: req.body.id,
+                post: req.body.idPost
+            }
+        
+            new Comentario(newComment).save().then(()=>{
+                req.flash("success_msg", "Comentário adicionado com sucesso");
+                res.redirect(req.body.urlInput);
+            }).catch((err)=>{
+                req.flash("error_msg", "Erro ao adicionar comentário");
+                res.redirect(req.body.urlInput);
+            })
+    
 })
-router.get('/logout', (req,res)=>{
-    req.logOut();
-    req.flash('sucess_msg', 'deslogado com sucesso!');
-    res.redirect("/")
-})
+
 module.exports = router;

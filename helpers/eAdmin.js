@@ -5,5 +5,5 @@ module.exports = {
         }
         req.flash("error_msg", "Página de admin!");
         res.redirect("/");
-    }
-}
+    
+}}

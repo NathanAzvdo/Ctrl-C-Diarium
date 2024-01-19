@@ -5,11 +5,7 @@
         <div class="display-6">Faça login:</div>
     </div>
     <div class="card" style="padding: 20px;">
-        {{#if error}}
-            <div class="alert alert-danger">{{error}}</div>
-        {{else}}
-
-        {{/if}}
+        {{>_msg}}
             <form action="/usuarios/log" method="post">
                 <label for="email">Email:</label>
                     <input type="email" name="email" class="form-control" required>

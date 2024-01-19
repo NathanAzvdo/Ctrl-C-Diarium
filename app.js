@@ -13,15 +13,15 @@ const passport = require('passport');
 require("./config/auth")(passport);
 const {eUser} = require('./helpers/eUser');
 
-
 // Models
+require('./models/Comentario');
 require('./models/Postagens');
 require('./models/Categoria');
 require('./models/usuario');  // Certifique-se de registrar o modelo de usuário corretamente
 const Postagem = mongoose.model('Postagens');
 const Categoria = mongoose.model('Categorias');
 const Usuario = mongoose.model('Usuarios');  // Ajuste o nome do modelo para 'Usuario'
-
+const Comentario = mongoose.model('Comentario')
 // Configuração
 
 //config sessão
@@ -54,11 +54,12 @@ mongoose.connect('mongodb://localhost/blogapp').then(()=>{
 }).catch((err) => {
     console.log('Error to connect to mongodb:' + err)
 })
+
 app.use((req, res, next)=>{
     res.locals.success_msg = req.flash("success_msg");
     res.locals.error_msg = req.flash("error_msg");
     res.locals.error = req.flash("error");
-    res.locals.user = req.user || null
+    res.locals.user = req.user || null;
     next();
 })
 
@@ -107,14 +108,26 @@ app.get('/categorias/posts/:slug', (req,res)=>{
     })
 })
 
-app.get('/categorias/postCompleto/:id', eUser, (req, res)=>{    
-    Postagem.findOne({_id: req.params.id}).then((postagem)=>{
-        res.render("categorias/postC", {postagem: postagem})
-    }).catch((err)=>{
-        req.flash("error_msg", "Erro ao carregar postagem")
-        res.redirect("categorias/posts")
-    })
+app.get('/categorias/postCompleto/:id', eUser, async (req, res) => {
+    try {
+      const postagem = await Postagem.findOne({ _id: req.params.id });
+      if (!postagem) {
+        req.flash("error_msg", "Postagem não encontrada");
+        return res.redirect("categorias/posts");
+      }
+  
+      // Buscar os comentários associados a essa postagem
+      const comentarios = await Comentario.find({ post: req.params.id }).populate('user');
+  
+      res.render("categorias/postC", { postagem: postagem, comentarios: comentarios });
+    } catch (err) {
+      console.error(err);
+      req.flash("error_msg", "Erro ao carregar postagem");
+      res.redirect("categorias/posts");
+    }
 });
+
+  
 
 
 app.use('/admin', admin);
