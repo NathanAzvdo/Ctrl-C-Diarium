@@ -31,7 +31,7 @@
         </div>
     </div>
     <hr class="animate__animated animate__zoomIn">
-    <h1 class="animate__animated animate__zoomIn" style="font-size: xxx-large;">
+    <h1 class="animate__animated animate__zoomIn display-4" style="font-size: xxx-large;">
         Posts recentes:
     </h1>
     <div class="card-columns animate__animated animate__fadeIn">
@@ -41,7 +41,7 @@
           <h5 class="card-title">{{titulo}}</h5>
           <p class="card-text">{{descricao}}</p>
           <div class="text-center">
-            <h5><strong>{{slug}}</strong></h5>
+            <h5>{{slug}}</h5>
           </div>
           <hr>
           <h4>Conteúdo:</h4>
@@ -53,6 +53,9 @@
       {{else}}
       <h5>Nenhuma postagem</h5>
     {{/each}}
+    <div class="text-center" style="margin: 10px 0 25px;">
+      <a href="">Todas as postagens</a>
+    </div>
   </div>
 
 </div>
