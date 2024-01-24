@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-require('../models/usuario');
-const Usuario = mongoose.model('Usuarios');
+require('../models/Usuario');
+const Usuario = mongoose.model('Usuario');
 require('../models/Comentario');
 const Comentario = mongoose.model('Comentario')
 const passport = require('passport')
@@ -16,49 +16,45 @@ router.post('/registrar', async (req, res) => {
     var erros = [];
     const regexEmail = /^\S+@\S+\.\S+$/;
 
-    if (!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null) {
-        erros.push({ texto: "Nome inválido!" });
-    }
-    if (!req.body.email || typeof req.body.email === "undefined" || req.body.email === null) {
-        erros.push({ texto: "Email é obrigatório!" });
-    } else if (!regexEmail.test(req.body.email)) {
-        erros.push({ texto: "Email inválido!" });
-    }
-    if (!req.body.senha || typeof req.body.senha == undefined || req.body.senha == null ||
-        !req.body.senhacf || typeof req.body.senhacf == undefined || req.body.senhacf == null) {
-        erros.push({ texto: "Senha inválida!" });
-    }
-    if (!req.body.telefone || typeof req.body.telefone == undefined || req.body.telefone == null) {
-        erros.push({ texto: "Telefone inválido!" });
-    }
-    if (req.body.nome.length < 3) {
-        erros.push({ texto: "Nome muito curto!" });
-    }
-    if (req.body.senha.length < 8) {
-        erros.push({ texto: "Senha muito curta! (Mínimo 8 caracteres)" });
-    }
-    if (req.body.senha !== req.body.senhacf) {
-        erros.push({ texto: "As senhas não conferem!" });
-    }
-
+    const validations = {
+        nome: { condition: !req.body.nome || typeof req.body.nome === "undefined" || req.body.nome === null, message: "Nome inválido!" },
+        email: { condition: !req.body.email || typeof req.body.email === "undefined" || req.body.email === null || !regexEmail.test(req.body.email), message: "Email inválido!" },
+        senha: { condition: !req.body.senha || typeof req.body.senha === "undefined" || req.body.senha === null || !req.body.senhacf || typeof req.body.senhacf === "undefined" || req.body.senhacf === null || req.body.senha.length < 8, message: "Senha inválida ou muito curta!" },
+        senha2:{condition: req.body.senha !== req.body.senhacf, message:"As senhas não conferem!"},
+        telefone: { condition: !req.body.telefone || typeof req.body.telefone === "undefined" || req.body.telefone === null, message: "Telefone inválido!" },
+        nomeLength: { condition: req.body.nome.length < 3, message: "Nome muito curto!" }
+    };
+    
+    Object.entries(validations).forEach(([field, { condition, message }]) => {
+        if (condition) {
+            erros.push({ texto: message });
+        }
+    });
     if (erros.length > 0) {
         res.render("usuario/cadastro", { erros: erros });
     } else {
-        try {
-            const emailExists = await Usuario.findOne({ email: req.body.email });
-            const usernameExists = await Usuario.findOne({ nome: req.body.nome });
-            const celExists = await Usuario.findOne({ cel: req.body.telefone });
-
-            if (emailExists) {
-                req.flash("error_msg", "Já existe uma conta com esse email!");
-                res.redirect("/usuarios/registro");
-            } else if (usernameExists) {
-                req.flash("error_msg", "Já existe uma conta com esse username!");
-                res.redirect("/usuarios/registro");
-            } else if (celExists) {
-                req.flash("error_msg", "Já existe uma conta com esse celular!");
-                res.redirect("/usuarios/registro");
-            } else {
+       
+            const validations2 ={
+                email:{
+                    condition: Usuario.findOne({ email: req.body.email }), message: "Email já cadastrado!"
+                },
+                username:{
+                    condition: Usuario.findOne({nome: req.body.nome}), message: "Nome de usuário já registrado"
+                },
+                cel:{
+                    condition: Usuario.findOne({cel: req.body.telefone}), message: "Telefone já registrado"
+                }
+            }
+            
+            Object.entries(validations2).forEach(([field, {condition, message}])=>{
+                if(condition){
+                    erros.push({texto:message})
+                }
+            })
+            if(erros.length >0){
+                res.render("usuario/cadastro", {erros: erros})
+            }
+            else {
                 const hashedPassword = await bcrypt.hash(req.body.senha, 10);
 
                 const newUser = {
@@ -76,10 +72,6 @@ router.post('/registrar', async (req, res) => {
                     res.redirect("/usuarios/registro");
                 });
             }
-        } catch (err) {
-            req.flash("error_msg", "Houve um erro interno!");
-            res.redirect("/usuarios/registro");
-        }
     }
 });
 
@@ -122,24 +114,27 @@ router.get('/logout', (req, res) => {
             console.error(err);
             return next(err);
         }
+        res.locals.user = null;
         req.flash('success_msg', 'Deslogado com sucesso!');
         res.redirect("/");
     });
 });
+
 router.post('/comment',(req, res) => {
-            const newComment ={
-                conteudo:req.body.cont,
-                user: req.body.id,
-                post: req.body.idPost
-            }
+            
+    const newComment ={
+        conteudo:req.body.cont,
+        user: req.body.id,
+        post: req.body.idPost
+    }
         
-            new Comentario(newComment).save().then(()=>{
-                req.flash("success_msg", "Comentário adicionado com sucesso");
-                res.redirect(req.body.urlInput);
-            }).catch((err)=>{
-                req.flash("error_msg", "Erro ao adicionar comentário");
-                res.redirect(req.body.urlInput);
-            })
+    new Comentario(newComment).save().then(()=>{
+        req.flash("success_msg", "Comentário adicionado com sucesso");
+        res.redirect(req.body.urlInput);
+    }).catch((err)=>{
+        req.flash("error_msg", "Erro ao adicionar comentário");
+        res.redirect(req.body.urlInput);
+    })
     
 })
 

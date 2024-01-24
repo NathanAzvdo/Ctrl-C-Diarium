@@ -3,9 +3,9 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const {eAdmin} = require('../helpers/eAdmin');
 require('../models/Categoria');
-const Categoria = mongoose.model("Categorias");
-require('../models/Postagens');
-const Postagem = mongoose.model("Postagens");
+const Categoria = mongoose.model("Categoria");
+require('../models/Postagem');
+const Postagem = mongoose.model("Postagem");
 //routes
 router.get('/', eAdmin, (req, res) => {
     res.render("admin/index");
@@ -19,55 +19,53 @@ router.get('/posts/add', eAdmin,  (req, res)=>{
     })
 });
 
-router.post('/posts/new', eAdmin, (req, res)=>{
-    var erros =[];
-    
-    if(!req.body.Title || typeof req.body.Title == undefined || req.body.Title == null){
-        erros.push({texto: "Nome inválido!"})
-    }
-    if(!req.body.Slug || typeof req.body.Slug == undefined || req.body.Slug == null){
-        erros.push({texto: "Slug inválido!"})
-    }
-    if(!req.body.Cont || typeof req.body.Cont == undefined || req.body.Cont == null){
-        erros.push({texto: "Conteúdo inválido!"})
-    }
-    if(!req.body.Desc || typeof req.body.Desc == undefined || req.body.Desc == null){
-        erros.push({texto: "Descrição inválida!"})
-    }
-    if(req.body.Title.length < 3){
-        erros.push({texto: "Título muito curto!"})
-    }
-    if(req.body.Cont < 10){
-        erros.push({texto: "Conteúdo muito curto!"})
+router.post('/posts/new', eAdmin, (req, res) => {
+    const erros = [];
 
-    }
-    if(req.body.Categoria=="0"){
-        erros.push("Registre uma categoria!")
-    }
-    if(req.body.Desc > 5){
-        erros.push("Descrição muito curta!");
-    }
-    if(erros.length>0){
-        res.render("admin/addposts", {erros: erros})
-    }
-    
-    else{
+    const validations = {
+        Title:{
+            condition: !req.body.Title || req.body.Title.length < 3, message: "Título inválido!"
+        },
+        Slug:{
+            condition: !req.body.Slug, message: "Slug inválido!"
+        },
+        Cont:{
+            condition: !req.body.Cont || req.body.Cont < 10, message: "Conteúdo inválido!"
+        },
+        Desc:{
+            condition: !req.body.Desc || req.body.Desc.length < 5, message: "Descrição inválida!"
+        },
+        Categoria:{condition: req.body.Categoria === "0", message: "Registre uma categoria!"
+        }
+    };
+
+    Object.entries(validations).forEach(([field, { condition, message }]) => {
+        if (condition) {
+            erros.push({ texto: message });
+        }
+    });
+
+    if (erros.length > 0) {
+        res.render("admin/addposts", { erros: erros });
+    } else {
         const newPosts = {
             titulo: req.body.Title,
             descricao: req.body.Desc,
             conteudo: req.body.Cont,
             slug: req.body.Slug,
             categoria: req.body.cat
-        }
-        new Postagem(newPosts).save().then(()=>{
+        };
+
+        new Postagem(newPosts).save().then(() => {
             req.flash("success_msg", "Postagem salva com sucesso!");
             res.redirect("/admin/posts");
-        }).catch((err)=>{
-            req.flash("error_msg", "Erro ao salvar postagem, tente novamente!")
-            res.redirect("/admin/posts")
-        })
+        }).catch((err) => {
+            req.flash("error_msg", "Erro ao salvar postagem, tente novamente!");
+            res.redirect("/admin/posts");
+        });
     }
-})
+});
+
 
 router.get('/categorias', eAdmin, (req, res) => {
     Categoria.find().then((categorias) =>{
@@ -88,47 +86,27 @@ router.get('/posts', eAdmin, (req, res) => {
     
 })
 router.get('/posts/remove/:id', eAdmin, async(req,res)=>{
-    const id = req.params.id;
-
-    try{
-        const resultEx = await Postagem.findByIdAndDelete(id);
-
-        if(resultEx){
+    Postagem.findByIdAndDelete(req.params.id).then(()=>{
             req.flash("success_msg", "Categoria deletada com sucesso!");
             res.redirect('/admin/posts');
-        }else {
-            req.flash("error_msg", "Não foi possível deletar a categoria!");
+    }).catch((err)=>{
+        req.flash("error_msg", "Não foi possível deletar a categoria!");
             res.redirect('/admin/posts');
-        } 
-    } catch (erro) {
-        console.error('Erro ao deletar categoria:', erro);
-        req.flash("error_msg", "Erro ao deletar categoria!");
-        res.redirect("/admin/categorias");
-    }
-    });
-
-router.get('/categorias/remove/:id', eAdmin, async (req, res) => {
-    const id = req.params.id;
-
-    try {
-        const resultadoExclusao = await Categoria.findByIdAndDelete(id);
-
-        if (resultadoExclusao) {
-            req.flash("success_msg", "Categoria deletada com sucesso!");
-            res.redirect("/admin/categorias");
-        } else {
-            req.flash("error_msg", "Não foi possível deletar a categoria!");
-            res.redirect("/admin/categorias");
-        }
-    } catch (erro) {
-        console.error('Erro ao deletar categoria:', erro);
-        req.flash("error_msg", "Erro ao deletar categoria!");
-        res.redirect("/admin/categorias");
-    }
+    }); 
 });
 
+router.get('/categorias/remove/:id', eAdmin, async (req, res) => {
+    Categoria.findByIdAndDelete(req.params.id).then(function(){
+            req.flash("success_msg", "Categoria deletada com sucesso!");
+            res.redirect("/admin/categorias");
+    }).catch(function(){
+            req.flash("error_msg", "Não foi possível deletar a categoria!");
+            res.redirect("/admin/categorias");
+        })
+    });
+
+
 router.get('/categorias/edit/:id', eAdmin, (req,res) => {
-    
     Categoria.findOne({_id:req.params.id}).then((categoria)=>{
         res.render('admin/editar', {categoria: categoria});
     }).catch((err)=>{
@@ -179,12 +157,14 @@ router.post('/categorias/edit', eAdmin, (req, res) => {
         res.redirect("/admin/categorias");
     });
 });
+
 router.post('/posts/edit', eAdmin, (req,res)=>{
     Postagem.findOne({_id: req.body.id}).then((postagem)=>{
         if(!postagem){
             req.flash("error_msg", "Postagem não encontrada para edição");
             return res.redirect("/admin/posts");
         }
+        
         postagem.titulo = req.body.Title;
         postagem.descricao = req.body.Desc;
         postagem.slug = req.body.Slug;
@@ -203,21 +183,26 @@ router.post('/posts/edit', eAdmin, (req,res)=>{
 
 router.post('/categorias/new', eAdmin, (req, res)=> {
     var erros =[];
+
+    const validations = {
+        Name:{
+            condition: !req.body.Name || req.body.Name.length < 2, message: "Nome inválido!"
+        },
+        Slug:{
+            condition: !req.body.Slug, message: "Slug inválido"
+        }
+    }
     
-    if(!req.body.Name || typeof req.body.Name == undefined || req.body.Name == null){
-        erros.push({texto: "Nome inválido!"})
-    }
-    if(!req.body.Slug || typeof req.body.Slug == undefined || req.body.Slug == null){
-        erros.push({texto: "Slug inválido!"})
-    }
-    if(req.body.Name.length < 2){
-        erros.push({texto: "Nome muito curto!"})
-    }
+    Object.entries(validations).forEach(([field, {condition, message}])=>{
+        if(condition){
+            erros.push({texto:message})
+        }
+    })
+    
     if(erros.length>0){
         res.render("admin/addcategoria", {erros: erros})
     }
     else{
-
         const newCat = {
             nome: req.body.Name,
             slug: req.body.Slug
@@ -232,6 +217,4 @@ router.post('/categorias/new', eAdmin, (req, res)=> {
     }
 })
 
-
-//exports routes to app.js
 module.exports = router;

@@ -1,30 +1,29 @@
-// Carregando módulos
 const express = require('express');
 const handlebars = require('express-handlebars');
 const bodyParser = require('body-parser');
 const app = express();
 const admin = require('./routes/admin');
 const path = require('path');
-const usuarios =require('./routes/usuario')
+const categorias = require('./routes/categoria')
+const usuarios =require('./routes/usuario');
+const index = require('./routes/index');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
 require("./config/auth")(passport);
-const {eUser} = require('./helpers/eUser');
 
-// Models
+
+
 require('./models/Comentario');
-require('./models/Postagens');
+require('./models/Postagem');
 require('./models/Categoria');
-require('./models/usuario');  // Certifique-se de registrar o modelo de usuário corretamente
-const Postagem = mongoose.model('Postagens');
-const Categoria = mongoose.model('Categorias');
-const Usuario = mongoose.model('Usuarios');  // Ajuste o nome do modelo para 'Usuario'
+require('./models/Usuario');  // Certifique-se de registrar o modelo de usuário corretamente
+const Postagem = mongoose.model('Postagem');
+const Categoria = mongoose.model('Categoria');
+const Usuario = mongoose.model('Usuario');  // Ajuste o nome do modelo para 'Usuario'
 const Comentario = mongoose.model('Comentario')
-// Configuração
 
-//config sessão
 app.use(session({
     secret:"secretTest",
     resave: true,
@@ -35,10 +34,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
-//body-parser
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-//handlebars
+
 app.engine('handlebars', handlebars.engine({
     defaultLayout: 'main',
     runtimeOptions: {
@@ -46,8 +45,18 @@ app.engine('handlebars', handlebars.engine({
         allowProtoMethodsByDefault: true,
     }
 }));
+
+const hbs = handlebars.create({});
+hbs.handlebars.registerHelper('isAdmin', function(user, options) {
+  if (user && user.eAdmin === 1) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+});
+
 app.set('view engine', 'handlebars');
-//mongoose
+
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/blogapp').then(()=>{
     console.log('Conected to database');
@@ -63,75 +72,16 @@ app.use((req, res, next)=>{
     next();
 })
 
-//arquivos estáticos
+
 app.use(express.static(path.join(__dirname, "public")));
-//utilizamos o dirname para pegar o caminho absoluto para o diretorio
-
-// Rotas
-app.get('/', (req, res)=>{
-    Postagem.find().populate("categoria").sort({ data: 'desc' }).limit(5)
-    .then((postagens) => {
-        res.render('index', { postagens: postagens });
-    })
-    .catch((err) => {
-        res.status(404).send('Erro 404: Página não encontrada');
-    });
-
-    
-    
-})
-
-app.get("/categorias", (req, res)=>{
-    Categoria.find().then((categorias)=>{
-        res.render('categorias/index', {categorias: categorias});
-    }).catch((err)=>{
-        req.flash("error_msg", "Erro ao carregar categorias");
-        res.redirect('/');
-    })
-});
-app.get('/categorias/posts/:slug', (req,res)=>{
-    Categoria.findOne({slug:req.params.slug}).then((categoria)=>{
-        if(categoria){
-            Postagem.find({categoria:categoria._id}).then((postagens)=>{
-                res.render("categorias/postagens", {categoria:categoria, postagens:postagens})
-            }).catch((err)=>{
-                req.flash('error_msg', "Erro ao carregar postagens")
-                res.render("categorias/index")
-            });  
-        }else{
-            req.flash("error_msg", "Essa categoria não existe");
-            res.redirect("/categorias/")
-        }
-    }).catch((err)=>{
-        req.flash("error_msg", "Houve um erro interno ao carregar a página dessa categoria!");
-        res.redirect("/categorias");
-    })
-})
-
-app.get('/categorias/postCompleto/:id', eUser, async (req, res) => {
-    try {
-      const postagem = await Postagem.findOne({ _id: req.params.id });
-      if (!postagem) {
-        req.flash("error_msg", "Postagem não encontrada");
-        return res.redirect("categorias/posts");
-      }
-  
-      // Buscar os comentários associados a essa postagem
-      const comentarios = await Comentario.find({ post: req.params.id }).populate('user');
-  
-      res.render("categorias/postC", { postagem: postagem, comentarios: comentarios });
-    } catch (err) {
-      console.error(err);
-      req.flash("error_msg", "Erro ao carregar postagem");
-      res.redirect("categorias/posts");
-    }
-});
-
-  
 
 
+
+app.use('/', index);
 app.use('/admin', admin);
 app.use('/usuarios', usuarios)
+app.use('/categorias', categorias)
+
 
 // Outros
 
@@ -140,5 +90,4 @@ const PORT = 8084;
 app.listen(PORT, () => {
     console.log("running on: localhost:" + PORT);
 });
-
 

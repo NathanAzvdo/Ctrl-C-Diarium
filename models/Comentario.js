@@ -8,12 +8,12 @@ const Comentario = new Schema({
     },
     post:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Postagens',
+        ref: 'Postagem',
         required:true 
     },
     user:{
          type: mongoose.Schema.Types.ObjectId,
-         ref: 'Usuarios',
+         ref: 'Usuario',
          required:true 
     },
     date:{

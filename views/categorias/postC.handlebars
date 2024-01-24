@@ -11,7 +11,7 @@
                 <p><b>descrição:</b></p>
                 <p class="card-text">{{postagem.descricao}}</p>
                 <div class="text-center" style="margin: 10px 0 30px">
-                    <h2><strong>{{postagem.slug}}</strong></h2>
+                    <h5><strong>{{postagem.slug}}</strong></h5>
                 </div>
                 <hr>
                 <h4>Conteúdo:</h4>
@@ -19,8 +19,8 @@
                 <hr>
                 <h2><strong>Comentários:</strong></h2>
                 {{#if user}}
-                <div class="card" style="padding:25px; margin:10px 0 10px">
-                    <form action="/usuarios/comment" method="post">
+                
+                    <form action="/usuarios/comment" method="post" style="margin:10px 0 15px">
                     <input type="hidden" value="{{postagem._id}}" name="idPost">
                     <input type="hidden" id="urlInput" name="urlInput">
                     <input type="hidden" name="id" value="{{user._id}}"></input>
@@ -31,24 +31,31 @@
                     </form>
                     
 
-                </div>
+                
                 {{else}}
                 {{/if}}
-                
                 {{#each comentarios}}
-                <hr>
-                    <div class="card" style="padding:10px; margin:10px 0 10px">
+                    <hr>
+                    <div class="card" style="padding:25px; margin:10px 0 10px">
                         <b>{{this.user.nome}}</b>
                         <p>{{this.conteudo}}</p>
-                        <div style="text-align:right">
-                            <img src="/img/heart.png" style="width:20px">
+
+                        <div style="text-align:left; margin:15px 0 10px">
+                            {{#if admin}}
+                                <button class="btn btn-danger" style="color:#fff;">Excluir</button>
+                            {{else}}
+                                <button class="btn btn-warning" style="color:#fff;">Reportar</button>
+                            {{/if}}
+                            <div style="text-align:right">
+                                <img src="/img/heart.png" style="width:20px; cursor:pointer">
+                            </div>
                         </div>
                     </div>
-                    
                 {{else}}
-                <hr>
-                    <b>Não há comentarios publicados!</b>
+                    <hr>
+                    <b>Não há comentários publicados!</b>
                 {{/each}}
+
             </div>
         </div>
     </div>

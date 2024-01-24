@@ -23,7 +23,10 @@
                 <div id="results-container">
                   <!-- Aqui serão exibidos os resultados da pesquisa -->
                 </div>
+                {{#if user}}
+                {{else}}
                 <a href="/usuarios/login">Faça login</a>
+                {{/if}}
             </div>
         </div>
     </div>
@@ -38,7 +41,7 @@
           <h5 class="card-title">{{titulo}}</h5>
           <p class="card-text">{{descricao}}</p>
           <div class="text-center">
-            <h2><strong>{{slug}}</strong></h2>
+            <h5><strong>{{slug}}</strong></h5>
           </div>
           <hr>
           <h4>Conteúdo:</h4>
@@ -54,42 +57,5 @@
 
 </div>
 <script>
-    function search() {
-  console.log('Função search() foi chamada.');
-
-  var searchInput = document.getElementById('search-input').value;
-  console.log('Valor da pesquisa:', searchInput);
-
-  var resultsContainer = document.getElementById('results-container');
-
-  var apiKey = 'YOUR_API_KEY';
-  var modelName = 'gpt-3.5-turbo-1106';
-
-  var requestOptions = {
-    method: 'post',
-    url: 'https://api.openai.com/v1/engines/' + modelName + '/completions',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + apiKey,
-    },
-    data: {
-      prompt: searchInput,
-      max_tokens: 100,
-    },
-  };
-
-  console.log('Enviando solicitação para a API:', requestOptions);
-
-  axios(requestOptions)
-    .then(function (response) {
-      console.log('Resposta da API:', response.data);
-      var apiResponse = response.data.choices[0].text;
-      resultsContainer.innerHTML = '<p>' + apiResponse + '</p>';
-    })
-    .catch(function (error) {
-      console.error('Erro na solicitação à API:', error);
-      resultsContainer.innerHTML = '<p>Erro ao se comunicar com a API.</p>';
-    });
-}
 
 </script>
