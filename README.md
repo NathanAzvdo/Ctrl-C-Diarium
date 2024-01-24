@@ -17,15 +17,15 @@ https://github.com/NathanAzvdo/ProjetoNODE.git
 2. Navegue até o diretório do projeto:
 cd projetoNode
 
-3.Instale as dependências:
+3. Instale as dependências:
 npm install
 
 4. Certifique que o mongodb está em execução em sua máquina.
    
-5.Inicie o servidor:
+5. Inicie o servidor:
 node app.js
 
-6.Acesse no seu navegador pela url:
+6. Acesse no seu navegador pela url:
 http://localhost:8084
 
 ## Acesso conta adm:
