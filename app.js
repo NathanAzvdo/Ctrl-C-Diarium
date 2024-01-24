@@ -2,11 +2,11 @@ const express = require('express');
 const handlebars = require('express-handlebars');
 const bodyParser = require('body-parser');
 const app = express();
-const admin = require('./routes/admin');
+const admin = require('./views/routes/admin');
 const path = require('path');
-const categorias = require('./routes/categoria')
-const usuarios =require('./routes/usuario');
-const index = require('./routes/index');
+const categorias = require('./views/routes/categoria')
+const usuarios =require('./views/routes/usuario');
+const index = require('./views/routes/index');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const flash = require('connect-flash');
@@ -46,15 +46,6 @@ app.engine('handlebars', handlebars.engine({
     }
 }));
 
-const hbs = handlebars.create({});
-hbs.handlebars.registerHelper('isAdmin', function(user, options) {
-  if (user && user.eAdmin === 1) {
-    return options.fn(this);
-  } else {
-    return options.inverse(this);
-  }
-});
-
 app.set('view engine', 'handlebars');
 
 mongoose.Promise = global.Promise;
@@ -69,7 +60,14 @@ app.use((req, res, next)=>{
     res.locals.error_msg = req.flash("error_msg");
     res.locals.error = req.flash("error");
     res.locals.user = req.user || null;
-    next();
+    if(!req.user){
+        next();
+    }else{
+        if(req.user.eAdmin){
+            res.locals.adm = true
+        }
+        next();
+    }
 })
 
 
@@ -83,7 +81,7 @@ app.use('/usuarios', usuarios)
 app.use('/categorias', categorias)
 
 
-// Outros
+
 
 const PORT = 8084;
 

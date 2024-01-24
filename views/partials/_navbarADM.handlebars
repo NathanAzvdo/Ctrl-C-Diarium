@@ -6,9 +6,15 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
+        {{#if adm}}
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/categorias">Categorias</a>
+        </li>
+        {{else}}
         <li class="nav-item">
           <a class="nav-link" href="/categorias">Categorias</a>
         </li>
+        {{/if}}
         {{#if user}}
         <li class="nav-item">
           <a class="nav-link" href="/usuarios/logout">Logout</a>
