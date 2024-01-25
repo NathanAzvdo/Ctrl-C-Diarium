@@ -42,7 +42,10 @@
 
                         <div style="text-align:left; margin:15px 0 10px">
                             {{#if ../adm}}
-                                <button class="btn btn-danger" style="color:#fff;">Excluir</button>
+                            <form action="/admin/delComment/{{_id}}" method="post">
+                                <input type="hidden" value="{{post._id}}" name="post">
+                                <button class="btn btn-danger" type="" style="color:#fff;">Excluir</button>
+                            </form>
                             {{else}}
                                 <button class="btn btn-warning" style="color:#fff;">Reportar</button>
                             {{/if}}
@@ -61,6 +64,10 @@
     </div>
 </div>
 <script>
-    // JavaScript para definir o valor do input como a URL atual
-    document.getElementById('urlInput').value = window.location.href;
+     document.addEventListener('DOMContentLoaded', function () {
+        const urlInput = document.getElementById('urlInput');
+        if (urlInput) {
+            urlInput.value = window.location.href;
+        }
+    });
 </script>

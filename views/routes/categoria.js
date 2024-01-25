@@ -12,7 +12,7 @@ const Comentario = mongoose.model('Comentario');
 const {eUser} = require('../../helpers/eUser');
 
 
-router.get("/", function(req, res){
+router.get("/", eUser, function(req, res){
     Categoria.find().then((categorias)=>{
         res.render('categorias/index', {categorias: categorias});
     }).catch((err)=>{
@@ -20,7 +20,7 @@ router.get("/", function(req, res){
         res.redirect('/');
     })
 });
-router.get('/posts/:slug', function(req,res){
+router.get('/posts/:slug', eUser, function(req,res){
     Categoria.findOne({slug:req.params.slug}).then((categoria)=>{
         if(categoria){
             Postagem.find({categoria:categoria._id}).then((postagens)=>{
@@ -37,6 +37,16 @@ router.get('/posts/:slug', function(req,res){
         req.flash("error_msg", "Houve um erro interno ao carregar a página dessa categoria!");
         res.redirect("/categorias");
     })
+})
+router.get('/posts', eUser, function(req,res){
+
+    Postagem.find().then((postagens)=>{
+        res.render("categorias/postagens", {postagens:postagens})
+    }).catch((err)=>{
+        req.flash('error_msg', "Erro ao carregar postagens")
+        res.render("categorias/index")
+    });  
+       
 })
 
 router.get('/postCompleto/:id', eUser, async function(req, res){

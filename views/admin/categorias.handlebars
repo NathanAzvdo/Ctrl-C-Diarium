@@ -1,33 +1,34 @@
 {{>_navbarADM}}
+
 <div class="container text-center">
     <div class="card" style="padding:10px">
-    {{>_msg}}
-    <a href="/admin/categorias/add"><button class="btn btn-success">Adicionar categoria</button></a>
-    <hr>
-    <table id="myTable" class="display">
-    <thead>
-        <tr>
-            <th>Nome</th>
-            <th>Slug</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {{#each categorias}}
-            <tr>
-                <td>{{nome}}</td>
-                <td>{{slug}}</td>
-                <td>
-                    <a href="/admin/categorias/edit/{{_id}}"><button class="btn btn-success">Editar</button></a>
-                    <a href="/admin/categorias/remove/{{_id}}"><button class="btn btn-danger">Excluir</button></a>
-
-                </td>
-            </tr>
-        {{else}}
-        {{/each}}
-    </tbody>
-</table>
+        {{>_msg}}
+        <a href="/admin/categorias/add" style="width:250px; margin:0 auto" class="btn btn-success">Adicionar categoria</a>
+        <hr>
+        <div class="table-responsive">
+            <table class="table table-striped" id="myTable">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Slug</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each categorias}}
+                        <tr>
+                            <td>{{nome}}</td>
+                            <td>{{slug}}</td>
+                            <td>
+                                <a href="/admin/categorias/edit/{{_id}}" class="btn btn-success">Editar</a>
+                                <a href="/admin/categorias/remove/{{_id}}" class="btn btn-danger">Excluir</a>
+                            </td>
+                        </tr>
+                    {{else}}
+                        <tr>Não há categorias registradas!</tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
     </div>
-
 </div>
-    

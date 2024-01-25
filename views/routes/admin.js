@@ -6,6 +6,8 @@ require('../../models/Categoria');
 const Categoria = mongoose.model("Categoria");
 require('../../models/Postagem');
 const Postagem = mongoose.model("Postagem");
+require('../../models/Comentario');
+const Comentario = mongoose.model('Comentario')
 //routes
 router.get('/', eAdmin, function(req, res){
     res.render("admin/index");
@@ -91,9 +93,18 @@ router.get('/posts/remove/:id', eAdmin, async function(req,res){
             res.redirect('/admin/posts');
     }).catch((err)=>{
         req.flash("error_msg", "Não foi possível deletar a categoria!");
-            res.redirect('/admin/posts');
+        res.redirect('/admin/posts');
     }); 
 });
+router.post('/delComment/:id',async function(req,res){
+    Comentario.findByIdAndDelete(req.params.id).then(()=>{
+        req.flash("success_msg", "comentário deletado com sucesso!");
+        res.redirect("/categorias/postCompleto/"+req.body.post);
+    }).catch((err)=>{
+        req.flash("error_msg", "Erro ao deletar comentário!");
+        res.redirect("/categorias/postCompleto/"+req.body.post);
+    })
+})
 
 router.get('/categorias/remove/:id', eAdmin, async function(req, res){
     Categoria.findByIdAndDelete(req.params.id).then(function(){
