@@ -67,39 +67,56 @@ router.get('/postCompleto/:id', eUser, async function(req, res){
 
 });
 
-router.post('/report/:id', eUser, function(req, res){    
-    Comentario.findOne({_id:req.params.id}).then((comentario)=>{
-        Report.findOne({Comentario: comentario._id}).then((report)=>{
-            if(report && report.UserReport._id == res.locals.user._id){
-                req.flash("success_msg", "Comentário já reportado anteriormente")
-                res.redirect("/categorias/postCompleto/"+req.body.post);
-            }else{
+router.post('/report/:id', eUser, async function(req, res) {
+    try {
+        const comentario = await Comentario.findById(req.params.id);
 
-                
-                const Reported = {
-                    Comentario: comentario._id,
-                    UserReport: res.locals.user._id,
-                    Postagem: req.body.post
-                }
-                
-                new Report(Reported).save().then(()=>{
-                    req.flash("success_msg", "Comentário reportado para o administrador. Será avaliado e, se necessário, removido para manter a comunidade saudável e respeitosa.");
-                    res.redirect("/categorias/postCompleto/"+req.body.post);
-                }).catch((err)=>{
-                    req.flash("error_msg", "Erro ao reportar comentárioooo!");
-                    res.redirect("/categorias/postCompleto/"+req.body.post);
-                });
-            }
-        }).catch((err)=>{
-            req.flash("error_msg", "ERro reportar comentário");
-            res.redirect("/categorias/postCompleto"+req.body.post)
-        })
+        if (!comentario) {
+            req.flash("error_msg", "Comentário não encontrado");
+            return res.redirect("/categorias/postCompleto/" + req.body.post);
+        }
 
-    }).catch((err)=>{
-        req.flash("error_msg", "Erro ao reportar comentário!");
-        res.redirect("/categorias/postCompleto/"+req.body.post);
-    })        
+        const existingReport = await Report.findOne({
+            Comentario: comentario._id,
+            UserReport: res.locals.user._id
+        });
+
+        if (existingReport) {
+            req.flash("success_msg", "Comentário já reportado anteriormente");
+            return res.redirect("/categorias/postCompleto/" + req.body.post);
+        }
+
+        const otherUserReports = await Report.findOne({
+            Comentario: comentario._id,
+            UserReport: { $ne: res.locals.user._id }
+        });
+
+        if (otherUserReports) {
+            await Report.findOneAndUpdate(
+                { Comentario: comentario._id },
+                { $inc: { NumeroReports: 1 } }
+            );
+            req.flash("success_msg", "Comentário reportado para o administrador. Será avaliado e, se necessário, removido para manter a comunidade saudável e respeitosa.");
+        } else {
+            const newReport = new Report({
+                Comentario: comentario._id,
+                UserReport: res.locals.user._id,
+                Postagem: req.body.post
+            });
+
+            await newReport.save();
+            req.flash("success_msg", "Comentário reportado para o administrador. Será avaliado e, se necessário, removido para manter a comunidade saudável e respeitosa.");
+        }
+
+        res.redirect("/categorias/postCompleto/" + req.body.post);
+    } catch (err) {
+        console.error("Erro ao reportar comentário:", err);
+        req.flash("error_msg", "Erro ao reportar comentário.");
+        res.redirect("/categorias/postCompleto/" + req.body.post);
+    }
 });
+
+
 
 
 
