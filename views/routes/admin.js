@@ -7,11 +7,26 @@ const Categoria = mongoose.model("Categoria");
 require('../../models/Postagem');
 const Postagem = mongoose.model("Postagem");
 require('../../models/Comentario');
+require('../../models/ComentarioReportado');
+const Report = mongoose.model('ComentarioReportado')
 const Comentario = mongoose.model('Comentario')
 //routes
+
 router.get('/', eAdmin, function(req, res){
-    res.render("admin/index");
-})
+    Report.find()
+        .populate('Comentario')
+        .populate('UserReport')
+        .populate('Postagem')
+        .then((reportado) => {
+            res.render("admin/index", { reportado: reportado });
+        })
+        .catch((err) => {
+            req.flash("error_msg", "Erro ao carregar página de adm");
+            res.redirect('/');
+        });
+});
+
+
 router.get('/posts/add', eAdmin,  function(req, res){
     Categoria.find().then((categorias)=>{
         res.render('admin/addposts', {categorias:categorias});
@@ -96,15 +111,47 @@ router.get('/posts/remove/:id', eAdmin, async function(req,res){
         res.redirect('/admin/posts');
     }); 
 });
-router.post('/delComment/:id',async function(req,res){
-    Comentario.findByIdAndDelete(req.params.id).then(()=>{
-        req.flash("success_msg", "comentário deletado com sucesso!");
-        res.redirect("/categorias/postCompleto/"+req.body.post);
-    }).catch((err)=>{
-        req.flash("error_msg", "Erro ao deletar comentário!");
-        res.redirect("/categorias/postCompleto/"+req.body.post);
-    })
-})
+
+router.post('/delComment/:id', eAdmin, async function(req, res) {
+    try {
+        const comentarioId = req.params.id;
+        const reportado = await Report.findOne({ Comentario: comentarioId });
+        if (reportado) {
+            await Report.findByIdAndDelete(reportado._id);
+        }
+        await Comentario.findByIdAndDelete(comentarioId);
+
+        req.flash("success_msg", "Comentário e relatório (se existir) deletados com sucesso!");
+        res.redirect("/categorias/postCompleto/" + req.body.post);
+    } catch (err) {
+        req.flash("error_msg", "Erro ao deletar comentário");
+        res.redirect("/categorias/postCompleto/" + req.body.post);
+    }
+});
+
+
+router.post('/delCommentIndex/:id', eAdmin, async function(req, res) {
+    try {
+        const reportado = await Report.findOneAndDelete({ _id: req.params.id });
+        
+        if (!reportado) {
+            req.flash("error_msg", "Erro ao deletar comentário");
+            res.redirect("/admin/");
+            return;
+        }
+
+        const comentarioId = reportado.Comentario;
+
+        await Comentario.findByIdAndDelete(comentarioId);
+
+        req.flash("success_msg", "Comentário deletado com sucesso!");
+        res.redirect("/admin/");
+    } catch (err) {
+        req.flash("error_msg", "Erro ao deletar comentário");
+        res.redirect("/admin/");
+    }
+});
+
 
 router.get('/categorias/remove/:id', eAdmin, async function(req, res){
     Categoria.findByIdAndDelete(req.params.id).then(function(){

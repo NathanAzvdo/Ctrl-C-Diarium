@@ -4,10 +4,12 @@ require('../../models/Comentario');
 require('../../models/Postagem');
 require('../../models/Categoria');
 require('../../models/Usuario');
+require('../../models/ComentarioReportado');
 const mongoose = require('mongoose');  
 const Postagem = mongoose.model('Postagem');
+const Report = mongoose.model('ComentarioReportado')
 const Categoria = mongoose.model('Categoria');
-const Usuario = mongoose.model('Usuario');  // Ajuste o nome do modelo para 'Usuario'
+const Usuario = mongoose.model('Usuario');
 const Comentario = mongoose.model('Comentario');
 const {eUser} = require('../../helpers/eUser');
 
@@ -64,5 +66,42 @@ router.get('/postCompleto/:id', eUser, async function(req, res){
     });
 
 });
+
+router.post('/report/:id', eUser, function(req, res){    
+    Comentario.findOne({_id:req.params.id}).then((comentario)=>{
+        Report.findOne({Comentario: comentario._id}).then((report)=>{
+            if(report && report.UserReport._id == res.locals.user._id){
+                req.flash("success_msg", "Comentário já reportado anteriormente")
+                res.redirect("/categorias/postCompleto/"+req.body.post);
+            }else{
+
+                
+                const Reported = {
+                    Comentario: comentario._id,
+                    UserReport: res.locals.user._id,
+                    Postagem: req.body.post
+                }
+                
+                new Report(Reported).save().then(()=>{
+                    req.flash("success_msg", "Comentário reportado para o administrador. Será avaliado e, se necessário, removido para manter a comunidade saudável e respeitosa.");
+                    res.redirect("/categorias/postCompleto/"+req.body.post);
+                }).catch((err)=>{
+                    req.flash("error_msg", "Erro ao reportar comentárioooo!");
+                    res.redirect("/categorias/postCompleto/"+req.body.post);
+                });
+            }
+        }).catch((err)=>{
+            req.flash("error_msg", "ERro reportar comentário");
+            res.redirect("/categorias/postCompleto"+req.body.post)
+        })
+
+    }).catch((err)=>{
+        req.flash("error_msg", "Erro ao reportar comentário!");
+        res.redirect("/categorias/postCompleto/"+req.body.post);
+    })        
+});
+
+
+
 
 module.exports = router;

@@ -53,9 +53,12 @@
       {{else}}
       <h5>Nenhuma postagem</h5>
     {{/each}}
-    <div class="text-center" style="margin: 10px 0 25px;">
-      <a href="/categorias/posts">Todas as postagens</a>
-    </div>
+    {{#if user}}
+      <div class="text-center" style="margin: 10px 0 25px;">
+        <a href="/categorias/posts">Todas as postagens</a>
+      </div>
+    {{else}}
+    {{/if}}
   </div>
 
 </div>

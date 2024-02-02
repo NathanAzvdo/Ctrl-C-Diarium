@@ -47,7 +47,10 @@
                                 <button class="btn btn-danger" type="" style="color:#fff;">Excluir</button>
                             </form>
                             {{else}}
-                                <button class="btn btn-warning" style="color:#fff;">Reportar</button>
+                            <form action="/categorias/report/{{_id}}" method="post">
+                                <input type="hidden" value="{{post._id}}" name="post">
+                                <button class="btn btn-warning"type="submit" style="color:#fff;">Reportar</button>
+                            </form>
                             {{/if}}
                             <div style="text-align:right">
                                 <img src="/img/heart.png" style="width:20px; cursor:pointer">

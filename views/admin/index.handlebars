@@ -18,5 +18,20 @@
     <h1 class="animate__animated animate__zoomIn display-4" style="font-size: xxx-large;">
         Comentários reportados:
     </h1>
+    {{#each reportado}}
+    <hr class="animate__animated animate__zoomIn">
+    <div class="card nimate__animated animate__zoomIn" style="padding:25px; margin:10px 0 10px">
+        <b>{{this.UserReport.nome}}</b>
+        <p>{{this.Comentario.conteudo}}</p>
+        <div style="text-align:left; margin:15px 0 10px">
+            <form action="/admin/delCommentIndex/{{this._id}}" method="post">
+                <button class="btn btn-danger" type="submit" style="color:#fff;">Excluir</button>
+            </form>
+        </div>
+        <a href="/categorias/postCompleto/{{this.Postagem._id}}">Ver postagem e comentários</a>
+    </div>
+    {{else}}
+    <h5 class="animate__animated animate__zoomIn">Não há comentários reportados!</h5>
+    {{/each}}
 
 </div>
