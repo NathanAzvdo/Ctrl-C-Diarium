@@ -30,7 +30,7 @@ http://localhost:8084
 
 ## Acesso conta adm:
 
-Para ter acesso a conta de ADM, modifique o valor do default no model usuário para 1, crie sua conta pela interface e coloque o valor como 0 novamente.
+Para ter acesso a conta de ADM, modifique o valor default do campo eAdmin no model usuário para 1, crie sua conta pela interface e coloque o valor como 0 novamente.
 
 ## Futuros upgrades:
 
