@@ -121,7 +121,7 @@ router.post('/delComment/:id', eAdmin, async function(req, res) {
         }
         await Comentario.findByIdAndDelete(comentarioId);
 
-        req.flash("success_msg", "Comentário e relatório (se existir) deletados com sucesso!");
+        req.flash("success_msg", "Comentário deletado com sucesso!");
         res.redirect("/categorias/postCompleto/" + req.body.post);
     } catch (err) {
         req.flash("error_msg", "Erro ao deletar comentário");

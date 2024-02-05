@@ -1,0 +1,18 @@
+{{>_navbarADM}}
+
+<div class="container">
+
+    {{>_msg}}
+
+    <div class="text-center">
+        <h1 class="display-6">Esqueceu sua senha?</h1>
+        <div class="card" style="padding:15px; width:50%; margin: 0 auto;">
+            <form method="post" action="/usuarios/rec/" style="padding:30px;">
+            <input type="email" placeholder="Digite seu email" class="form-control"  name="email"><br>
+            <button class="btn btn-success" type="submit" style="width:60%">Recuperar</button>
+            </form>
+        <a href="/usuarios/registro">Cadastre-se</a>
+        </div>
+    </div>
+
+</div>

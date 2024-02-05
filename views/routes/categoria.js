@@ -82,7 +82,7 @@ router.post('/report/:id', eUser, async function(req, res) {
         });
 
         if (existingReport) {
-            req.flash("success_msg", "Comentário já reportado anteriormente");
+            req.flash("error_msg", "Comentário já reportado anteriormente");
             return res.redirect("/categorias/postCompleto/" + req.body.post);
         }
 

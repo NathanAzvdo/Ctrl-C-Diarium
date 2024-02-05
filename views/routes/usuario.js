@@ -133,4 +133,9 @@ router.post('/comment', function(req, res) {
 
 });
 
+router.get('/recuperacao', function(req, res){
+    res.render('usuario/recSenha');
+})
+
+
 module.exports = router;

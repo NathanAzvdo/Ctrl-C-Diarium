@@ -49,12 +49,9 @@
                             {{else}}
                             <form action="/categorias/report/{{_id}}" method="post">
                                 <input type="hidden" value="{{post._id}}" name="post">
-                                <button class="btn btn-warning"type="submit" style="color:#fff;">Reportar</button>
+                                <button class="btn btn-warning" type="submit" style="color:#fff;">Reportar</button>
                             </form>
                             {{/if}}
-                            <div style="text-align:right">
-                                <img src="/img/heart.png" style="width:20px; cursor:pointer">
-                            </div>
                         </div>
                     </div>
                 {{else}}
@@ -73,4 +70,7 @@
             urlInput.value = window.location.href;
         }
     });
+
+
+
 </script>
