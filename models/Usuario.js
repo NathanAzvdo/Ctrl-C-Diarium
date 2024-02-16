@@ -14,10 +14,19 @@ const Usuario = new Schema({
     eAdmin:{
         type:Number,
         default:0
-    }, 
+    },
+    resetpasstoken:{
+        type: String,
+        select: false
+    },
+    tokenExpires:{
+        type:Date,
+        select:false
+    },  
     senha:{
         type:String,
-        required:true
+        required:true,
+        select:false
     },
     cel:{
         type:String,

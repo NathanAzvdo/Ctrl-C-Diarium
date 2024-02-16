@@ -7,6 +7,8 @@ const Usuario = mongoose.model('Usuario');
 require('../../models/Comentario');
 const Comentario = mongoose.model('Comentario');
 const passport = require('passport');
+const crypto = require('crypto');
+const transport = require("../../modules/mailer")
 
 router.get('/registro', function(req, res) {
     res.render('usuario/cadastro');
@@ -135,6 +137,44 @@ router.post('/comment', function(req, res) {
 
 router.get('/recuperacao', function(req, res){
     res.render('usuario/recSenha');
+})
+
+router.post('/esquecisenha', async function(req,res){
+    const email  = req.body.email
+
+    try{
+        Usuario.findOne({email: email}).then(async(user)=>{
+            const token = crypto.randomBytes(6).toString('hex');
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+
+            await Usuario.findByIdAndUpdate(user._id, {
+                '$set':{
+                    resetpasstoken: token,
+                    tokenExpires: now
+                }
+            })
+            console.log(token, now)
+            transport.sendMail({
+                to: email,
+                from:"nathan.azevedo28012004@gmail.com",
+                template:"../../resources/mail/forgot.html",
+                context:{token}
+            }, (err)=>{
+                if(err){
+                    req.flash("error_msg", "Erro ao encaminhar mensagem para sua caixa de email, tente novamente!")
+                    res.redirect("/usuarios/recuperacao");
+                }
+            })
+            
+
+        }).catch(()=>{
+            req.flash('error_msg', "Erro ao recuperar senha!")
+            res.redirect("/usuarios/recuperacao")
+        })
+    }catch{
+        res.status(400).send({error: "Erro ao recuperar senha, tente novamente mais tarde!"})
+    }
 })
 
 

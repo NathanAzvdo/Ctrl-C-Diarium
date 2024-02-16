@@ -18,8 +18,8 @@
                 <p style="white-space: pre-wrap">{{postagem.conteudo}}</p>
                 <hr>
                 <h2><strong>Comentários:</strong></h2>
-                {{#if user}}
-                
+                {{#if adm}}
+                {{else}}
                     <form action="/usuarios/comment" method="post" style="margin:10px 0 15px">
                     <input type="hidden" value="{{postagem._id}}" name="idPost">
                     <input type="hidden" id="urlInput" name="urlInput">
@@ -29,10 +29,6 @@
                             <button type="submit" class="btn btn-success">Comentar</button>
                         </div>
                     </form>
-                    
-
-                
-                {{else}}
                 {{/if}}
                 {{#each comentarios}}
                     <hr>

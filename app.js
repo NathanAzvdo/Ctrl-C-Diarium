@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const admin = require('./views/routes/admin');
 const path = require('path');
+const fs = require('fs');
 const categorias = require('./views/routes/categoria')
 const usuarios =require('./views/routes/usuario');
 const index = require('./views/routes/index');
