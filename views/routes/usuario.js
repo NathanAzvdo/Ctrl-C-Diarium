@@ -77,9 +77,9 @@ router.get("/login", function(req, res) {
     res.render("usuario/login");
 });
 
-router.post('/log', function(req, res, next) {
-
-    passport.authenticate("local", function(err, user, info) {
+router.post('/log', (req, res, next) => {
+    passport.authenticate("local", (err, user, info) => {
+        
         if (err) {
             return next(err);
         }
@@ -88,19 +88,21 @@ router.post('/log', function(req, res, next) {
             return res.redirect("/usuarios/login");
         }
 
-        req.logIn(user, function(err) {
+        req.logIn(user, (err) => {
             if (err) {
                 return next(err);
             }
-            res.locals.user = { username: user._id };
+            res.locals.user = {username: user._id};
+            // Verifica se eAdmin é igual a 1
             if (user.eAdmin === 1) {
                 return res.redirect("/admin");
             } else {
                 return res.redirect("/");
             }
         });
-    })(req, res, next);
 
+
+    })(req, res, next);
 });
 
 router.get('/logout', function(req, res) {
@@ -157,15 +159,17 @@ router.post('/esquecisenha', async function(req,res){
             console.log(token, now)
             transport.sendMail({
                 to: email,
-                from:"nathan.azevedo28012004@gmail.com",
-                template:"../../resources/mail/forgot.html",
+                from:"Ctrl+c_diarium@gmail.com",
+                template:"/forgot",
                 context:{token}
             }, (err)=>{
                 if(err){
+                    console.error('Erro ao enviar o e-mail:', err);
                     req.flash("error_msg", "Erro ao encaminhar mensagem para sua caixa de email, tente novamente!")
                     res.redirect("/usuarios/recuperacao");
                 }
             })
+        res.redirect("/usuarios/verificacaoToken/"+user._id);
             
 
         }).catch(()=>{
@@ -176,6 +180,8 @@ router.post('/esquecisenha', async function(req,res){
         res.status(400).send({error: "Erro ao recuperar senha, tente novamente mais tarde!"})
     }
 })
-
+router.get('/verificacaoToken/:id', function(req,res){
+    res.render("usuario/verifica", {id: req.params.id})
+})
 
 module.exports = router;
