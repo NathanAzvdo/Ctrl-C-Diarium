@@ -19,10 +19,10 @@ require("./config/auth")(passport);
 require('./models/Comentario');
 require('./models/Postagem');
 require('./models/Categoria');
-require('./models/Usuario');  // Certifique-se de registrar o modelo de usuário corretamente
+require('./models/Usuario');  
 const Postagem = mongoose.model('Postagem');
 const Categoria = mongoose.model('Categoria');
-const Usuario = mongoose.model('Usuario');  // Ajuste o nome do modelo para 'Usuario'
+const Usuario = mongoose.model('Usuario'); 
 const Comentario = mongoose.model('Comentario')
 
 app.use(session({

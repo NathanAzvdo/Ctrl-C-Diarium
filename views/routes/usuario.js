@@ -150,13 +150,14 @@ router.post('/esquecisenha', async function(req,res){
             const now = new Date();
             now.setHours(now.getHours() + 1);
 
-            await Usuario.findByIdAndUpdate(user._id, {
-                '$set':{
-                    resetpasstoken: token,
-                    tokenExpires: now
-                }
+            user.resetpasstoken = token;
+            user.tokenExpires = now;
+            await user.save().then(()=>{
+                console.log("token salvo")
+            }).catch((err)=>{
+                console.log('erro:'+ err)
             })
-            console.log(token, now)
+
             transport.sendMail({
                 to: email,
                 from:"Ctrl+c_diarium@gmail.com",
@@ -164,16 +165,15 @@ router.post('/esquecisenha', async function(req,res){
                 context:{token}
             }, (err)=>{
                 if(err){
-                    console.error('Erro ao enviar o e-mail:', err);
                     req.flash("error_msg", "Erro ao encaminhar mensagem para sua caixa de email, tente novamente!")
                     res.redirect("/usuarios/recuperacao");
                 }
             })
+        
         res.redirect("/usuarios/verificacaoToken/"+user._id);
             
-
         }).catch(()=>{
-            req.flash('error_msg', "Erro ao recuperar senha!")
+            req.flash('error_msg', "Não há conta registrada nesse email!")
             res.redirect("/usuarios/recuperacao")
         })
     }catch{
@@ -181,7 +181,74 @@ router.post('/esquecisenha', async function(req,res){
     }
 })
 router.get('/verificacaoToken/:id', function(req,res){
-    res.render("usuario/verifica", {id: req.params.id})
+    res.render("usuario/verifica", {id: req.params.id});
 })
 
+router.post('/resetPass', async function(req,res){
+    const token = req.body.token;
+    const id = req.body.id;
+    try{
+        const now = new Date()
+        Usuario.findOne({_id: id}).then((user)=>{
+            
+            if(token !== user.resetpasstoken){
+                req.flash("error_msg", "Token inválido!")
+                res.redirect("/usuarios/verificacaoToken/"+user._id)
+            }else if(now > user.tokenExpires){
+                req.flash('error_msg', "Token expirado!")
+                res.redirect("/usuarios/verificacaoToken/"+user._id)
+            }
+            else{
+                res.render('usuario/novasenha', {id: user._id, token: user.resetpasstoken})
+            }
+
+        }).catch((err)=>{
+            res.status(400).send({error:'Erro, tente novamente mais tarde'})
+        })
+    }catch{
+        res.status(400).send({error:'Erro, tente novamente mais tarde'})
+    }
+})
+
+router.post('/newpass', function(req,res){
+    Usuario.findOne({_id: req.body.id}).then(async(user)=>{
+        if(user.resetpasstoken !== req.body.token){
+            req.flash("error_msg", "Token inválido!")
+            res.redirect('/usuarios/verificacaoToken/'+req.params.id); 
+        }else{
+            var erros = []
+            const validations = {
+                senha: { condition: !req.body.senha || typeof req.body.senha === "undefined" || req.body.senha === null || !req.body.senhacf || typeof req.body.senhacf === "undefined" || req.body.senhacf === null || req.body.senha.length < 8, message: "Senha inválida ou muito curta!" },
+                senha2:{condition: req.body.senha !== req.body.senhacf, message:"As senhas não conferem!"}
+            }
+            Object.entries(validations).forEach(function([field, { condition, message }]) {
+                if (condition) {
+                    erros.push({ texto: message });
+                }
+            });
+            
+            if (erros.length > 0) {
+                res.redirect('/usuarios/verificacaoToken/'+user._id, {erros:erros}) 
+            } else{
+                const hashedPassword = await bcrypt.hash(req.body.senha, 10);
+
+                user.senha = hashedPassword;
+                user.tokenExpires = null;
+                user.resetpasstoken = null;
+                user.save().then((us)=>{
+
+                    req.flash('success_msg', "Senha alterada com sucesso!");
+                    res.redirect("/usuarios/login")
+                }).catch((err)=>{
+                    req.flash('error_msg', 'houve um erro ao alterar sua senha!');
+                    res.redirect('/')
+                })
+            }
+        }
+    }).catch((err) => {
+        req.flash("error_msg", "Algo deu errado ao redefinir a senha, tente novamente mais tarde!");
+        res.redirect('/usuarios/verificacaoToken/' + req.params.id);
+    })
+    
+})
 module.exports = router;

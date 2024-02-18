@@ -7,8 +7,15 @@
     <div class="text-center">
         <h3 class="display-8 fw-normal">Cole aqui o token recebido no email</h3>
         <div class="card" style="padding:15px; width:50%; margin: 0 auto;">
-            <form method="" action="" style="padding:30px;">
-            <input type="text" placeholder="Token" name="id" class="form-control"><br>
+            {{#each erros}}
+                <div class="alert alert-danger" role="alert">
+                    {{texto}}
+                </div>
+            {{else}}
+            
+            {{/each}}
+            <form method="post" action="/usuarios/resetpass" style="padding:30px;">
+            <input type="text" placeholder="Digite o token" name="token" class="form-control"><br>
             <input type="hidden" value="{{id}}" name="id">
             <button class="btn btn-success" type="submit" style="width:60%">Continuar</button>
             </form>

@@ -1,0 +1,31 @@
+{{>_navbarADM}}
+
+<div class="container">
+
+    {{>_msg}}
+
+    <div class="text-center">
+        <h3 class="display-8 fw-normal">Digite sua nova senha</h3>
+        <div class="card" style="padding:15px; width:50%; margin: 0 auto;">
+            {{#each erros}}
+                <div class="alert alert-danger" role="alert">
+                    {{texto}}
+                </div>
+            {{else}}
+            
+            {{/each}}
+            <form method="post" action="/usuarios/newpass" style="padding:30px;">
+            <label for="senha">Digite a nova senha:</label>
+                <input type="password" name="senha" class="form-control" required>
+            <label for="senhacf">Confirme a senha:</label>
+                <input type="password" name="senhacf" class="form-control" required>
+            <input type="hidden" value="{{id}}" name="id">
+            <input type="hidden" value="{{token}}" name="token">
+            
+            <button class="btn btn-success" type="submit" style="width:60%">Alterar</button>
+
+            </form>
+        </div>
+    </div>
+
+</div>

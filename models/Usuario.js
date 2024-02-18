@@ -17,11 +17,9 @@ const Usuario = new Schema({
     },
     resetpasstoken:{
         type: String,
-        select: false
     },
     tokenExpires:{
         type:Date,
-        select:false
     },  
     senha:{
         type:String,
