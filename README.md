@@ -32,6 +32,19 @@ http://localhost:8084
 
 Para ter acesso a conta de ADM, modifique o valor default do campo eAdmin no model usuário para 1, crie sua conta pela interface e coloque o valor como 0 novamente.
 
+## Como uso a recuperação por email?
+
+Crie uma conta na mailtrap, e pegue os dados necessários para a integração, logo após crie um arquivo chamado mail.json na pasta config.
+
+{<BR>
+    "host": "",<br>
+    "port": "",<br>
+    "user": "",<br>
+    "pass": ""<br>
+}<br><br>
+
+Troque pelos seus dados fornecidos na plataforma(não esqueça de selecionar a integração com node no site)
+
 ## Futuros upgrades:
 
 <ul>
