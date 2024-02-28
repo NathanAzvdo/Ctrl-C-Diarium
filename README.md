@@ -49,7 +49,6 @@ Troque pelos seus dados fornecidos na plataforma(não esqueça de selecionar a i
 
 <ul>
   <li>Webchat entre os usuários</li>
-  <li>Recuperação de senha</li>
   <li>Verificação de duas etapas</li>
   <li>Terminar a conexão com OpenIa Api</li>
 </ul>

@@ -1,17 +1,20 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-require('../../models/Postagem');
-const mongoose = require('mongoose')
-const Postagem = mongoose.model('Postagem');
+require("../../models/Postagem");
+const mongoose = require("mongoose");
+const Postagem = mongoose.model("Postagem");
 
-router.get('/', function(req, res){
-    Postagem.find().populate("categoria").sort({ data: 'desc' }).limit(5)
+router.get("/", function (req, res) {
+  Postagem.find()
+    .populate("categoria")
+    .sort({ data: "desc" })
+    .limit(5)
     .then((postagens) => {
-        res.render('index', { postagens: postagens });
+      res.render("index", { postagens: postagens });
     })
     .catch((err) => {
-        res.status(404).send('Erro 404: Página não encontrada');
-    });    
-})
+      res.status(404).send("Erro 404: Página não encontrada");
+    });
+});
 
 module.exports = router;
