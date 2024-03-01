@@ -9,6 +9,7 @@ const Comentario = mongoose.model("Comentario");
 const passport = require("passport");
 const crypto = require("crypto");
 const transport = require("../../modules/mailer");
+const { eUser } = require("../../helpers/eUser");
 
 router.get("/registro", function (req, res) {
   res.render("usuario/cadastro");
@@ -146,7 +147,7 @@ router.post("/log", (req, res, next) => {
         return next(err);
       }
       res.locals.user = { username: user._id };
-      // Verifica se eAdmin é igual a 1
+
       if (user.eAdmin === 1) {
         return res.redirect("/admin");
       } else {
@@ -168,7 +169,7 @@ router.get("/logout", function (req, res) {
   });
 });
 
-router.post("/comment", function (req, res) {
+router.post("/comment", eUser, function (req, res) {
   const newComment = {
     conteudo: req.body.cont,
     user: req.body.id,

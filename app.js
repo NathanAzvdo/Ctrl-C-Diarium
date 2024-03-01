@@ -84,7 +84,7 @@ app.use("/admin", admin);
 app.use("/usuarios", usuarios);
 app.use("/categorias", categorias);
 
-const PORT = 8084;
+const PORT = process.env.PORT || 8084;
 
 app.listen(PORT, () => {
   console.log("running on: localhost:" + PORT);

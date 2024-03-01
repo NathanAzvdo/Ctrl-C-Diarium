@@ -29,7 +29,13 @@ const Usuario = new Schema({
         type:String,
         required:true, 
         unique:true
+    },
+    is_online:{
+        type:String,
+        default:0
     }
-})
+},
+    {timestamps:true}
+)
 
 mongoose.model("Usuario", Usuario)
